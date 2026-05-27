@@ -1,0 +1,28 @@
+# fly.toml - Fly.io configuration for Tyrone's POS System
+# Generated for fly.io deployment
+
+app = "tyronepos"          # Change this to your unique app name
+primary_region = "sin"     # Singapore — closest to Philippines
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false    # Keep always on — never sleep
+  auto_start_machines = true
+  min_machines_running = 1      # Always at least 1 machine running
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1

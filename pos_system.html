@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tyrone's POS</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#EFF4FB;--panel:#F7FAFF;--card:#FFFFFF;
+  --accent:#1A5DC8;--accent2:#2E7CF6;--accent3:#5BA4FF;
+  --dark:#0D1B3E;--mid:#3A5A8C;--muted:#7A96C2;
+  --border:#C8D9F0;--border2:#E0ECFF;--sidebar:#0D1B3E;
+  --success:#0F6E56;--warn:#854F0B;--danger:#A32D2D;
+  --sidebar-w:240px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--dark);display:flex;flex-direction:column}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;height:100%}
+.logo-wrap{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.07)}
+.logo-mark{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#5BA4FF;margin-bottom:2px}
+.logo-title{font-size:17px;font-weight:600;color:#EFF4FB;line-height:1.2}
+.nav-section{padding:16px 10px 0;flex:1;overflow-y:auto}
+.nav-label{font-size:9.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(90,160,255,.45);padding:0 10px;margin-bottom:6px;margin-top:14px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;color:rgba(239,244,251,.45);font-size:13px;cursor:pointer;margin-bottom:2px;transition:.15s;font-weight:400}
+.nav-item i{font-size:17px;flex-shrink:0}
+.nav-item:hover{background:rgba(46,124,246,.15);color:#EFF4FB}
+.nav-item.active{background:rgba(46,124,246,.22);color:#5BA4FF;font-weight:500}
+.staff-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.staff-info .name{font-size:12.5px;color:#EFF4FB;font-weight:500}
+.staff-info .role{font-size:10.5px;color:var(--muted)}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative}
+
+/* ── TOPBAR ── */
+.topbar{padding:12px 22px;display:flex;align-items:center;gap:14px;background:var(--card);border-bottom:1px solid var(--border);flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:600;color:var(--dark);white-space:nowrap}
+.search-wrap{position:relative;flex:1;max-width:300px}
+.search-wrap input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);font-size:13px;color:var(--dark);outline:none;font-family:'Sora',sans-serif;transition:.15s}
+.search-wrap input:focus{border-color:var(--accent2)}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px}
+.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.db-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;font-size:11.5px;color:var(--mid)}
+.db-dot{width:7px;height:7px;border-radius:50%;background:#1D9E75;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mid);font-size:16px;transition:.15s}
+.icon-btn:hover{background:var(--bg);color:var(--accent)}
+
+/* ── CONTENT ── */
+.content-area{flex:1;display:flex;overflow:hidden;position:relative}
+.view{display:none;flex:1;flex-direction:column;overflow:hidden}
+.view.active{display:flex}
+
+/* ── REGISTER: products fill full width now ── */
+.products-area{flex:1;overflow-y:auto;padding:22px 26px 100px}
+
+/* ── BIGGER PRODUCT CARDS ── */
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.cat-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12.5px;color:var(--mid);cursor:pointer;font-family:'Sora',sans-serif;font-weight:500;transition:.15s}
+.cat-btn:hover{border-color:var(--accent2);color:var(--accent)}
+.cat-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin-bottom:24px}
+.prod-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:20px 18px;cursor:pointer;transition:.18s;position:relative;overflow:hidden}
+.prod-card:hover{border-color:var(--accent2);transform:translateY(-3px);box-shadow:0 8px 24px rgba(26,93,200,.13)}
+.prod-card:active{transform:translateY(-1px)}
+.prod-card.out{opacity:.5;pointer-events:none}
+.low-badge{position:absolute;top:12px;right:12px;background:#EFF4FB;color:var(--accent);font-size:10px;font-weight:600;padding:3px 8px;border-radius:8px;border:1px solid var(--border)}
+.prod-icon{font-size:42px;margin-bottom:12px;display:block;line-height:1}
+.prod-id{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-bottom:4px}
+.prod-name{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:6px;line-height:1.3}
+.prod-price{font-size:17px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.prod-stock{font-size:11px;color:var(--muted);margin-top:2px}
+.prod-expiry{font-size:10.5px;color:var(--muted);margin-top:2px}
+
+/* ── FLOATING CART FAB ── */
+.cart-fab{position:fixed;bottom:28px;right:28px;width:62px;height:62px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;z-index:200;box-shadow:0 6px 24px rgba(26,93,200,.38);transition:.2s}
+.cart-fab:hover{background:var(--accent2);transform:scale(1.06)}
+.cart-fab:active{transform:scale(.97)}
+.cart-fab-badge{position:absolute;top:-4px;right:-4px;width:22px;height:22px;border-radius:50%;background:#E24B4A;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;pointer-events:none;opacity:0;transform:scale(.6);transition:.2s}
+.cart-fab-badge.show{opacity:1;transform:scale(1)}
+
+/* ── CART DRAWER (slide-in from right) ── */
+.cart-overlay{position:fixed;inset:0;background:rgba(13,27,62,.35);z-index:300;opacity:0;pointer-events:none;transition:.25s}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-drawer{position:fixed;top:0;right:0;height:100%;width:390px;background:var(--card);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:301;transform:translateX(100%);transition:.28s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 32px rgba(13,27,62,.15)}
+.cart-drawer.open{transform:translateX(0)}
+.cart-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cart-head-left{display:flex;flex-direction:column;gap:3px}
+.cart-title{font-size:15px;font-weight:600;color:var(--dark)}
+.cart-count-badge{background:var(--accent2);color:#fff;font-size:10px;font-weight:600;padding:2px 9px;border-radius:8px;width:fit-content}
+.order-meta{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.cart-close-btn{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mid);font-size:17px;transition:.13s;flex-shrink:0}
+.cart-close-btn:hover{background:var(--border);color:var(--dark)}
+.cart-body{flex:1;overflow-y:auto;padding:14px 20px}
+.empty-state{text-align:center;padding:50px 16px;color:var(--muted)}
+.empty-state i{font-size:42px;display:block;margin-bottom:10px;opacity:.25}
+.empty-state p{font-size:13.5px;font-weight:500;margin-bottom:4px}
+.empty-state span{font-size:12px}
+.cart-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border2)}
+.ci-icon{font-size:22px;width:34px;text-align:center;flex-shrink:0}
+.ci-info{flex:1;min-width:0}
+.ci-name{font-size:13px;font-weight:500;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-sub{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.qty-ctrl{display:flex;align-items:center;gap:5px}
+.qb{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mid);font-size:13px;font-weight:700;transition:.13s}
+.qb:hover{border-color:var(--accent);color:var(--accent)}
+.qn{font-size:13px;font-weight:600;color:var(--dark);min-width:20px;text-align:center}
+.cart-foot{padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.disc-row{display:flex;gap:6px;margin-bottom:13px}
+.disc-btn{flex:1;padding:8px 4px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:11px;color:var(--mid);cursor:pointer;font-family:'Sora',sans-serif;text-align:center;transition:.15s;font-weight:500}
+.disc-btn:hover{border-color:var(--accent2);color:var(--accent)}
+.disc-btn.active{border-color:var(--accent2);background:#EFF4FB;color:var(--accent);font-weight:600}
+.totals{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.tot-row{display:flex;justify-content:space-between;font-size:13px;color:var(--mid)}
+.tot-row.disc-line{color:var(--accent2)}
+.tot-row.grand{font-size:16px;font-weight:700;color:var(--dark);border-top:1.5px solid var(--border);padding-top:10px;margin-top:4px}
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.pay-btn{padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:12.5px;font-weight:500;color:var(--mid);cursor:pointer;font-family:'Sora',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s}
+.pay-btn:hover{border-color:var(--accent2);color:var(--accent)}
+.pay-btn.active{border-color:var(--accent);background:#EFF4FB;color:var(--accent);font-weight:600}
+.cash-fields{margin-bottom:11px;display:none}
+.cash-fields input{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dark);background:var(--bg);outline:none;margin-bottom:5px}
+.cash-fields input:focus{border-color:var(--accent2)}
+.cash-fields .change-line{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:600;padding:3px 2px}
+.digital-fields{margin-bottom:11px;display:none}
+.digital-fields input{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dark);background:var(--bg);outline:none}
+.digital-fields input:focus{border-color:var(--accent2)}
+.checkout-btn{width:100%;padding:14px;border-radius:13px;border:none;background:var(--accent);color:#fff;font-size:14.5px;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:8px}
+.checkout-btn:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px)}
+.checkout-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── INVENTORY / STAFF VIEWS ── */
+.view-body{flex:1;overflow-y:auto;padding:20px 24px}
+.view-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.view-h{font-size:16px;font-weight:600;color:var(--dark)}
+.btn-primary{padding:8px 18px;border-radius:8px;background:var(--accent);color:#fff;border:none;font-size:12.5px;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s}
+.btn-primary:hover{background:var(--accent2)}
+.btn-outline{padding:7px 16px;border-radius:8px;background:var(--card);border:1.5px solid var(--border);color:var(--mid);font-size:12.5px;font-weight:500;font-family:'Sora',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s}
+.btn-outline:hover{border-color:var(--accent2);color:var(--accent)}
+.table-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead th{padding:10px 14px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border2);transition:.13s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#F0F5FF}
+tbody td{padding:10px 14px;color:var(--dark)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11.5px}
+.stock-ok{color:var(--success);font-weight:600}
+.stock-low{color:var(--warn);font-weight:600}
+.stock-out{color:var(--danger);font-weight:600}
+.cat-tag{display:inline-block;padding:2px 9px;border-radius:8px;font-size:10.5px;font-weight:500}
+.cat-Grains{background:#EAF3DE;color:#27500A}
+.cat-Dairy{background:#E6F1FB;color:#0C447C}
+.cat-Canned{background:#FAEEDA;color:#633806}
+.cat-Snacks{background:#FBEAF0;color:#72243E}
+
+/* ── SALES STATS (manager only) ── */
+.sales-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.big-stat{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px}
+.big-stat-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.big-stat-val{font-size:26px;font-weight:700;color:var(--accent);line-height:1}
+.big-stat-sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ── TABS ── */
+.tab-row{display:flex;gap:4px;margin-bottom:16px;background:var(--bg);padding:4px;border-radius:10px;border:1.5px solid var(--border);width:fit-content}
+.tab{padding:6px 16px;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--mid);cursor:pointer;transition:.13s}
+.tab.active{background:var(--card);color:var(--accent);font-weight:600;box-shadow:0 1px 4px rgba(26,93,200,.1)}
+
+/* ── MODALS ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(13,27,62,.4);z-index:400;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border-radius:16px;padding:24px;width:380px;border:1.5px solid var(--border)}
+.modal h3{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:16px}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:11.5px;font-weight:500;color:var(--mid);margin-bottom:5px}
+.form-row input,.form-row select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Sora',sans-serif;font-size:13px;color:var(--dark);background:var(--bg);outline:none}
+.form-row input:focus,.form-row select:focus{border-color:var(--accent2)}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.modal-btns .btn-primary{flex:1;justify-content:center}
+.modal-btns .btn-outline{justify-content:center}
+.login-modal{background:var(--card);border-radius:16px;padding:28px;width:340px;border:1.5px solid var(--border)}
+.login-modal h3{font-size:16px;font-weight:600;color:var(--dark);margin-bottom:5px}
+.login-modal .sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.login-err{font-size:12px;color:var(--danger);margin-top:8px;display:none}
+
+/* ── INVOICE MODAL ── */
+.invoice-wrap{background:var(--card);border-radius:20px;width:400px;max-height:88vh;display:flex;flex-direction:column;border:1.5px solid var(--border);box-shadow:0 24px 80px rgba(13,27,62,.22);overflow:hidden}
+.invoice-scroll{overflow-y:auto;flex:1}
+.receipt{background:#fff;width:100%;font-family:'DM Sans',sans-serif}
+.receipt-top{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);padding:28px 24px 20px;text-align:center;color:#fff}
+.receipt-top .r-logo{width:52px;height:52px;background:rgba(255,255,255,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px}
+.receipt-top .r-store{font-size:18px;font-weight:700;letter-spacing:.3px;margin-bottom:2px}
+.receipt-top .r-tagline{font-size:11px;opacity:.75;letter-spacing:.5px}
+.receipt-divider{display:flex;align-items:center;gap:0;overflow:hidden}
+.receipt-divider span{width:18px;height:18px;border-radius:50%;background:var(--bg);flex-shrink:0}
+.receipt-divider span:first-child{margin-left:-9px}
+.receipt-divider span:last-child{margin-right:-9px}
+.receipt-dashes{flex:1;border-top:2px dashed var(--border);margin:0 2px}
+.receipt-body{padding:20px 24px}
+.receipt-meta{display:flex;justify-content:space-between;margin-bottom:16px}
+.receipt-meta-item .lbl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.receipt-meta-item .val{font-size:13px;font-weight:600;color:var(--dark);font-family:'JetBrains Mono',monospace}
+.receipt-items{margin-bottom:4px}
+.receipt-item-head{display:flex;justify-content:space-between;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--border2);margin-bottom:4px}
+.r-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border2)}
+.r-item:last-child{border-bottom:none}
+.r-item-icon{font-size:20px;width:30px;text-align:center;flex-shrink:0}
+.r-item-info{flex:1;min-width:0}
+.r-item-name{font-size:13px;font-weight:500;color:var(--dark)}
+.r-item-qty{font-size:11px;color:var(--muted)}
+.r-item-price{font-size:13px;font-weight:600;color:var(--dark);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.receipt-totals{background:var(--bg);border-radius:12px;padding:14px 16px;margin-top:14px}
+.r-tot-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mid);padding:3px 0}
+.r-tot-row.disc{color:var(--accent2)}
+.r-tot-row.grand{font-size:16px;font-weight:700;color:var(--dark);border-top:1.5px solid var(--border);padding-top:10px;margin-top:6px}
+.receipt-payment{margin-top:16px;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:12px}
+.pay-icon-wrap{width:38px;height:38px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.pay-details .pay-method{font-size:13px;font-weight:600;color:var(--dark)}
+.pay-details .pay-info{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.receipt-bottom{padding:16px 24px 20px;text-align:center}
+.receipt-bottom .thank-you{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:4px}
+.receipt-bottom .r-note{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+.receipt-bottom .r-barcode{display:flex;justify-content:center;gap:1px;margin-bottom:8px}
+.receipt-bottom .r-barcode span{display:inline-block;width:2px;background:var(--dark);border-radius:1px}
+.receipt-bottom .r-order-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.invoice-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--card);flex-shrink:0}
+.invoice-foot .btn-primary{flex:1;justify-content:center;padding:11px}
+.invoice-foot .btn-outline{flex:1;justify-content:center;padding:11px}
+
+/* ── CUSTOMER AUTH SPLASH ── */
+.auth-splash{position:fixed;inset:0;background:linear-gradient(135deg,var(--dark) 0%,#1A3A6B 100%);z-index:500;display:flex;align-items:center;justify-content:center}
+.auth-card{background:var(--card);border-radius:24px;padding:36px;width:400px;border:1.5px solid var(--border);box-shadow:0 32px 80px rgba(0,0,0,.4)}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo img{width:64px;height:64px;object-fit:contain;border-radius:16px;background:#fff;padding:4px;margin-bottom:10px;display:block;margin:0 auto 10px}
+.auth-logo .brand{font-size:22px;font-weight:700;color:var(--dark)}
+.auth-logo .tagline{font-size:12px;color:var(--muted)}
+.auth-tabs{display:flex;gap:4px;background:var(--bg);padding:4px;border-radius:10px;margin-bottom:24px}
+.auth-tab{flex:1;padding:8px;border-radius:7px;text-align:center;font-size:13px;font-weight:500;color:var(--mid);cursor:pointer;transition:.15s;font-family:'Sora',sans-serif}
+.auth-tab.active{background:var(--card);color:var(--accent);font-weight:600;box-shadow:0 1px 4px rgba(26,93,200,.1)}
+.auth-form .form-row{margin-bottom:14px}
+.auth-form .form-row label{display:block;font-size:11.5px;font-weight:600;color:var(--mid);margin-bottom:5px;letter-spacing:.3px}
+.auth-form .form-row input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Sora',sans-serif;font-size:13.5px;color:var(--dark);background:var(--bg);outline:none;transition:.15s}
+.auth-form .form-row input:focus{border-color:var(--accent2);background:#fff}
+.auth-submit{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:14px;font-weight:600;font-family:'Sora',sans-serif;cursor:pointer;margin-top:4px;transition:.18s}
+.auth-submit:hover{opacity:.9;transform:translateY(-1px)}
+.auth-err{font-size:12px;color:var(--danger);margin-top:10px;text-align:center;display:none}
+.auth-guest{text-align:center;margin-top:16px;font-size:12px;color:var(--muted)}
+.auth-guest a{color:var(--accent2);cursor:pointer;font-weight:500;text-decoration:underline}
+
+/* ── CUSTOMER HEADER BADGE ── */
+.customer-badge{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;font-size:12.5px;cursor:pointer;transition:.15s}
+.customer-badge:hover{border-color:var(--accent2)}
+.customer-badge .c-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.customer-badge .c-name{font-weight:500;color:var(--dark);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── MY ORDERS VIEW ── */
+.my-orders-empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.my-orders-empty i{font-size:48px;display:block;margin-bottom:12px;opacity:.25}
+.my-orders-empty p{font-size:14px;font-weight:500;margin-bottom:6px}
+.order-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;cursor:pointer;transition:.15s}
+.order-card:hover{border-color:var(--accent2);box-shadow:0 4px 16px rgba(26,93,200,.1)}
+.order-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.order-card-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--accent)}
+.order-card-date{font-size:11px;color:var(--muted)}
+.order-card-total{font-size:18px;font-weight:700;color:var(--dark)}
+.order-card-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.order-pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500;background:var(--bg);color:var(--mid);border:1px solid var(--border)}
+
+/* ── RECEIPT REDESIGN ── */
+.invoice-wrap{background:var(--card);border-radius:22px;width:420px;max-height:90vh;display:flex;flex-direction:column;border:none;box-shadow:0 32px 80px rgba(13,27,62,.25);overflow:hidden}
+.invoice-scroll{overflow-y:auto;flex:1}
+.receipt{background:#fff;width:100%}
+.receipt-top{background:linear-gradient(150deg,#0D1B3E 0%,#1A5DC8 60%,#2E7CF6 100%);padding:32px 28px 24px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.receipt-top::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.05)}
+.receipt-top::after{content:'';position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.04)}
+.r-logo{width:58px;height:58px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;position:relative;z-index:1;backdrop-filter:blur(4px)}
+.r-store{font-size:20px;font-weight:700;letter-spacing:.5px;margin-bottom:3px;position:relative;z-index:1}
+.r-tagline{font-size:10.5px;opacity:.65;letter-spacing:2px;text-transform:uppercase;position:relative;z-index:1}
+.r-status-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:10px;position:relative;z-index:1;backdrop-filter:blur(4px)}
+.r-status-dot{width:6px;height:6px;border-radius:50%;background:#4ADE80}
+.receipt-divider{display:flex;align-items:center;overflow:hidden;background:#fff}
+.receipt-divider span{width:20px;height:20px;border-radius:50%;background:var(--bg);flex-shrink:0;box-shadow:inset 0 0 0 1.5px var(--border)}
+.receipt-divider span:first-child{margin-left:-10px}
+.receipt-divider span:last-child{margin-right:-10px}
+.receipt-dashes{flex:1;border-top:2px dashed var(--border);margin:0 3px}
+.receipt-body{padding:22px 26px}
+.receipt-meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding:14px 16px;background:var(--bg);border-radius:12px;border:1px solid var(--border2)}
+.receipt-meta-item .lbl{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.receipt-meta-item .val{font-size:13px;font-weight:700;color:var(--dark);font-family:'JetBrains Mono',monospace}
+.receipt-items-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between}
+.r-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border2)}
+.r-item:last-child{border-bottom:none}
+.r-item-icon-wrap{width:38px;height:38px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid var(--border2)}
+.r-item-info{flex:1;min-width:0}
+.r-item-name{font-size:13px;font-weight:600;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-item-qty{font-size:11.5px;color:var(--muted);margin-top:1px}
+.r-item-price{font-size:14px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.receipt-totals{background:var(--bg);border-radius:14px;padding:16px;margin-top:16px;border:1px solid var(--border2)}
+.r-tot-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mid);padding:4px 0}
+.r-tot-row.disc{color:var(--accent2)}
+.r-tot-row.grand{font-size:18px;font-weight:800;color:var(--dark);border-top:2px solid var(--border);padding-top:12px;margin-top:6px}
+.r-tot-row.grand span:last-child{color:var(--accent)}
+.receipt-payment{margin-top:16px;padding:14px 16px;background:linear-gradient(135deg,#EFF4FB,#E0ECFF);border:1.5px solid var(--border);border-radius:14px;display:flex;align-items:center;gap:14px}
+.pay-icon-wrap{width:42px;height:42px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;flex-shrink:0;box-shadow:0 4px 12px rgba(26,93,200,.3)}
+.pay-details .pay-method{font-size:13.5px;font-weight:700;color:var(--dark)}
+.pay-details .pay-info{font-size:11.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:1px}
+.receipt-bottom{padding:20px 26px 26px;text-align:center}
+.receipt-bottom .thank-you{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:5px}
+.receipt-bottom .r-note{font-size:12px;color:var(--muted);margin-bottom:18px}
+.r-barcode{display:flex;justify-content:center;align-items:flex-end;gap:1.5px;margin-bottom:10px;height:36px}
+.r-barcode span{display:inline-block;width:2.5px;background:var(--dark);border-radius:1px;opacity:.7}
+.r-order-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px}
+.invoice-foot{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--card);flex-shrink:0}
+.invoice-foot .btn-primary{flex:1;justify-content:center;padding:12px;font-size:13.5px}
+.invoice-foot .btn-outline{flex:1;justify-content:center;padding:12px;font-size:13.5px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:#EFF4FB;padding:9px 18px;border-radius:10px;font-size:12.5px;font-weight:500;opacity:0;transition:.25s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+</style>
+</head>
+<body>
+<!-- CUSTOMER AUTH SPLASH -->
+<div class="auth-splash" id="auth-splash">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div style="font-size:40px;margin-bottom:8px">🛒</div>
+      <div class="brand">Tyrone's POS</div>
+      <div class="tagline">Sign in to start shopping</div>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</div>
+      <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Create Account</div>
+    </div>
+    <!-- LOGIN FORM -->
+    <div id="auth-login-form" class="auth-form">
+      <div class="form-row"><label>Email Address</label><input type="email" id="cust-login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doCustomerLogin()"></div>
+      <div class="form-row"><label>Password</label><input type="password" id="cust-login-pass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doCustomerLogin()"></div>
+      <button class="auth-submit" onclick="doCustomerLogin()">Sign In →</button>
+      <div class="auth-err" id="login-cust-err">Invalid email or password.</div>
+    </div>
+    <!-- REGISTER FORM -->
+    <div id="auth-register-form" class="auth-form" style="display:none">
+      <div class="form-row"><label>Full Name</label><input type="text" id="cust-reg-name" placeholder="Your full name"></div>
+      <div class="form-row"><label>Email Address</label><input type="email" id="cust-reg-email" placeholder="your@email.com"></div>
+      <div class="form-row"><label>Password</label><input type="password" id="cust-reg-pass" placeholder="Create a password" onkeydown="if(event.key==='Enter')doCustomerRegister()"></div>
+      <button class="auth-submit" onclick="doCustomerRegister()">Create Account →</button>
+      <div class="auth-err" id="register-cust-err">Registration failed. Try again.</div>
+    </div>
+    <div class="auth-guest">Just browsing? <a onclick="guestMode()">Continue as Guest</a></div>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-mark">POS v1.0</div>
+    <div class="logo-title">Simple Automated<br>POS System</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Shop</div>
+    <div class="nav-item active" onclick="switchView('register',this)"><i class="ti ti-shopping-cart"></i> Register</div>
+    <div class="nav-label">Staff</div>
+    <div class="nav-item" id="nav-inventory" onclick="requireLogin('inventory',this)"><i class="ti ti-package"></i> Inventory</div>
+    <div class="nav-item" id="nav-sales" onclick="requireLogin('sales',this)"><i class="ti ti-chart-bar"></i> Sales History</div>
+    <div class="nav-item" id="nav-restock-log" onclick="requireLogin('restock-log',this)"><i class="ti ti-rotate-clockwise-2"></i> Restock Log</div>
+    <div class="nav-item" id="nav-timelog" onclick="requireLogin('timelog',this)"><i class="ti ti-clock"></i> Time Logs</div>
+    <div class="nav-item" id="nav-audit" onclick="requireLogin('audit',this)"><i class="ti ti-shield-check"></i> Audit Trail</div>
+    <div class="nav-item" id="nav-my-orders" onclick="switchView('my-orders',this)" style="display:none"><i class="ti ti-clock-history"></i> My Orders</div>
+
+    <div class="nav-label">System</div>
+    <div class="nav-item" id="nav-login-btn" onclick="openLoginModal()"><i class="ti ti-lock"></i> Staff Login</div>
+    <div class="nav-item" id="nav-logout-btn" style="display:none" onclick="logout()"><i class="ti ti-logout"></i> Logout</div>
+  </div>
+  <div class="staff-footer" id="staff-footer" style="display:none">
+    <div class="avatar" id="staff-avatar">?</div>
+    <div class="staff-info">
+      <div class="name" id="staff-name-display">—</div>
+      <div class="role" id="staff-role-display">Not logged in</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Register</div>
+    <div class="search-wrap" id="search-bar">
+      <i class="ti ti-search"></i>
+      <input type="text" id="search-input" placeholder="Search by name or ID…" oninput="filterProducts(this.value)">
+    </div>
+    <div class="topbar-right">
+      <div id="customer-badge-wrap" style="display:none">
+        <div class="customer-badge" onclick="showMyOrders()">
+          <div class="c-avatar" id="cust-avatar">?</div>
+          <span class="c-name" id="cust-name-badge">Guest</span>
+          <i class="ti ti-chevron-down" style="font-size:13px;color:var(--muted)"></i>
+        </div>
+      </div>
+      <div class="db-pill"><span class="db-dot"></span> DB Connected</div>
+      <div class="icon-btn" title="Print"><i class="ti ti-printer"></i></div>
+      <div class="icon-btn" title="Refresh" onclick="location.reload()"><i class="ti ti-refresh"></i></div>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- ══ REGISTER VIEW — full width products ══ -->
+    <div class="view active" id="view-register">
+      <div class="products-area">
+        <div class="cats">
+          <button class="cat-btn active" onclick="filterCat('All',this)">All Items</button>
+          <button class="cat-btn" onclick="filterCat('Grains',this)">🌾 Grains</button>
+          <button class="cat-btn" onclick="filterCat('Dairy',this)">🥛 Dairy</button>
+          <button class="cat-btn" onclick="filterCat('Canned',this)">🥫 Canned</button>
+          <button class="cat-btn" onclick="filterCat('Snacks',this)">🍿 Snacks</button>
+        </div>
+        <div class="sec-label" id="prod-section-label">All Products</div>
+        <div class="prod-grid" id="prod-grid"></div>
+      </div>
+    </div>
+
+    <!-- ══ INVENTORY ══ -->
+    <div class="view" id="view-inventory">
+      <div class="view-body">
+        <div class="view-head">
+          <div class="view-h">Inventory — Stock Report</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="tab-row" id="inv-tabs">
+              <div class="tab active" onclick="filterInvCat('All',this)">All</div>
+              <div class="tab" onclick="filterInvCat('Grains',this)">Grains</div>
+              <div class="tab" onclick="filterInvCat('Dairy',this)">Dairy</div>
+              <div class="tab" onclick="filterInvCat('Canned',this)">Canned</div>
+              <div class="tab" onclick="filterInvCat('Snacks',this)">Snacks</div>
+            </div>
+            <button class="btn-primary" onclick="openRestockModal()"><i class="ti ti-plus"></i> Restock Item</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Product Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Par Level</th><th>Expiry</th><th>Last Restocked</th></tr></thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SALES (manager only — stats shown here) ══ -->
+    <div class="view" id="view-sales">
+      <div class="view-body">
+        <div class="view-head">
+          <div class="view-h">Sales History</div>
+          <div class="search-wrap" style="max-width:280px;margin:0">
+            <i class="ti ti-search"></i>
+            <input type="text" id="sales-search" placeholder="Search order #, payment, discount…" oninput="filterSalesTable(this.value)" style="width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);font-size:13px;color:var(--dark);outline:none;font-family:'Sora',sans-serif">
+          </div>
+        </div>
+        <!-- Stats row lives HERE (manager panel only) -->
+        <div class="sales-stats">
+          <div class="big-stat">
+            <div class="big-stat-label">Session Revenue</div>
+            <div class="big-stat-val" id="ss-revenue">₱0.00</div>
+            <div class="big-stat-sub" id="ss-orders">0 orders</div>
+          </div>
+          <div class="big-stat">
+            <div class="big-stat-label">Avg Order Value</div>
+            <div class="big-stat-val" id="ss-avg">₱0.00</div>
+            <div class="big-stat-sub">per transaction</div>
+          </div>
+          <div class="big-stat">
+            <div class="big-stat-label">Total Discounts</div>
+            <div class="big-stat-val" id="ss-disc">₱0.00</div>
+            <div class="big-stat-sub">total deducted</div>
+          </div>
+          <div class="big-stat">
+            <div class="big-stat-label">Items Sold</div>
+            <div class="big-stat-val" id="ss-items">0</div>
+            <div class="big-stat-sub">units this session</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order #</th><th>Items</th><th>Subtotal</th><th>Discount</th><th>Total</th><th>Payment</th><th>Discount Type</th></tr></thead>
+            <tbody id="sales-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RESTOCK LOG ══ -->
+    <div class="view" id="view-restock-log">
+      <div class="view-body">
+        <div class="view-head"><div class="view-h">Restock Log</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date/Time</th><th>ID</th><th>Product</th><th>Added</th><th>Old Stock</th><th>New Stock</th><th>By</th></tr></thead>
+            <tbody id="restock-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TIME LOG ══ -->
+    <div class="view" id="view-timelog">
+      <div class="view-body">
+        <div class="view-head"><div class="view-h">Staff Time Logs / Attendance</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date/Time</th><th>Role</th><th>Name</th><th>Action</th></tr></thead>
+            <tbody id="timelog-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AUDIT TRAIL ══ -->
+    <div class="view" id="view-audit">
+      <div class="view-body">
+        <div class="view-head"><div class="view-h">Audit Trail</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date/Time</th><th>Event</th><th>Details</th></tr></thead>
+            <tbody id="audit-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MY ORDERS ══ -->
+    <div class="view" id="view-my-orders">
+      <div class="view-body">
+        <div class="view-head">
+          <div class="view-h" id="my-orders-title">My Order History</div>
+          <button class="btn-outline" onclick="signOutCustomer()"><i class="ti ti-logout"></i> Sign Out</button>
+        </div>
+        <div id="my-orders-content">
+          <div class="my-orders-empty"><i class="ti ti-receipt-off"></i><p>No orders yet</p><span>Your completed orders will appear here</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══ FLOATING CART FAB ══ -->
+<button class="cart-fab" id="cart-fab" onclick="openCart()" title="View Cart" style="display:none">
+  <i class="ti ti-shopping-cart"></i>
+  <span class="cart-fab-badge" id="fab-badge">0</span>
+</button>
+
+<!-- ══ CART OVERLAY ══ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+
+<!-- ══ CART DRAWER ══ -->
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <div class="cart-head-left">
+      <div class="cart-title">Current Order</div>
+      <span class="cart-count-badge" id="cart-badge">0 items</span>
+      <div class="order-meta" id="order-meta">Order #0001</div>
+    </div>
+    <button class="cart-close-btn" onclick="closeCart()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="cart-body" id="cart-body">
+    <div class="empty-state">
+      <i class="ti ti-basket"></i>
+      <p>Cart is empty</p>
+      <span>Click a product to add</span>
+    </div>
+  </div>
+  <div class="cart-foot">
+    <div class="disc-row">
+      <button class="disc-btn" id="db-pwd" onclick="toggleDisc('PWD')">♿ PWD 20%</button>
+      <button class="disc-btn" id="db-senior" onclick="toggleDisc('Senior')">👴 Senior 20%</button>
+      <button class="disc-btn" id="db-none" onclick="toggleDisc(null)" style="flex:.6">✕ None</button>
+    </div>
+    <div class="totals">
+      <div class="tot-row"><span>Subtotal</span><span id="tot-sub">₱0.00</span></div>
+      <div class="tot-row disc-line" id="tot-disc-row" style="display:none"><span id="tot-disc-label">Discount</span><span id="tot-disc-val">-₱0.00</span></div>
+      <div class="tot-row grand"><span>Total</span><span id="tot-total">₱0.00</span></div>
+    </div>
+    <div class="pay-grid">
+      <button class="pay-btn active" id="pay-cash" onclick="setPayment('Cash')"><i class="ti ti-cash"></i> Cash</button>
+      <button class="pay-btn" id="pay-card" onclick="setPayment('Card')"><i class="ti ti-credit-card"></i> Card</button>
+      <button class="pay-btn" id="pay-gcash" onclick="setPayment('GCash')"><i class="ti ti-device-mobile"></i> GCash</button>
+      <button class="pay-btn" id="pay-other" onclick="setPayment('Other')"><i class="ti ti-wallet"></i> Other</button>
+    </div>
+    <div class="cash-fields" id="cash-fields">
+      <input type="number" id="cash-tendered" placeholder="Amount Tendered (₱)" oninput="calcChange()" min="0" step="0.01">
+      <div class="change-line" id="change-line"></div>
+    </div>
+    <div class="digital-fields" id="digital-fields">
+      <input type="text" id="account-info" placeholder="Account / Card Number">
+    </div>
+    <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>
+      <i class="ti ti-check"></i> Process Payment
+    </button>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-bg" id="invoice-modal">
+  <div class="invoice-wrap">
+    <div class="invoice-scroll">
+      <div class="receipt" id="receipt-render"></div>
+    </div>
+    <div class="invoice-foot">
+      <button class="btn-primary" onclick="printInvoice()"><i class="ti ti-printer"></i> Print</button>
+      <button class="btn-outline" onclick="closeInvoice()"><i class="ti ti-x"></i> Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-bg" id="login-modal">
+  <div class="login-modal">
+    <h3>Staff Authentication</h3>
+    <p class="sub">Enter your password to access staff features</p>
+    <div class="form-row">
+      <label>Password</label>
+      <input type="password" id="login-pw" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-err" id="login-err">✘ Access Denied: Incorrect Password.</div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="doLogin()"><i class="ti ti-lock-open"></i> Login</button>
+      <button class="btn-outline" onclick="closeLoginModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-bg" id="restock-modal">
+  <div class="modal">
+    <h3><i class="ti ti-package" style="vertical-align:-2px;margin-right:6px;color:var(--accent)"></i>Restock Item</h3>
+    <div class="form-row">
+      <label>Product ID</label>
+      <select id="restock-id" onchange="fillRestockInfo()">
+        <option value="">— Select Product —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Current Stock</label>
+      <input type="text" id="restock-current" readonly placeholder="—" style="color:var(--muted)">
+    </div>
+    <div class="form-row">
+      <label>Quantity to Add</label>
+      <input type="number" id="restock-qty" placeholder="Enter quantity" min="1">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="doRestock()"><i class="ti ti-check"></i> Confirm Restock</button>
+      <button class="btn-outline" onclick="closeRestockModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const PASSWORDS = { admin:"admin123", employee:"employee123" };
+
+// ════════════ API CONFIG ════════════
+// Auto-detect: if served from Java server use relative path, else absolute
+const API = (location.protocol === 'file:') 
+  ? 'http://localhost:8080/api' 
+  : '/api';
+
+// Icon map — enriches DB products with emojis
+const ICONS = {
+  Grains:{'101':'🌾','102':'🌾','103':'🍞','104':'🍝','105':'🥣'},
+  Dairy: {'201':'🥛','202':'🧀','203':'🧈','204':'🫙','205':'🥛'},
+  Canned:{'301':'🥫','302':'🥫','303':'🐟','304':'🫛','305':'🥛'},
+  Snacks:{'401':'🥔','402':'🍫','403':'🥜','404':'🍪','405':'🐻'},
+};
+function iconFor(id, cat){ return (ICONS[cat]||{})[id] || '📦'; }
+
+let INVENTORY = {};   // populated from DB on load
+let cart={}, activeDisc=null, payMethod='Cash', orderCount=1;
+let totalRevenue=0, totalItems=0, sessionOrders=0, totalDiscounts=0;
+let activeCat='All', searchQ='', invCat='All';
+let currentUser=null, pendingView=null;
+
+// ════════════ INIT ════════════
+async function init(){
+  setDbStatus('connecting');
+  await loadProductsFromDB();
+  populateRestockSelect();
+  document.getElementById('cart-fab').style.display='flex';
+}
+
+function setDbStatus(state){
+  const dot = document.querySelector('.db-dot');
+  const pill = document.querySelector('.db-pill');
+  if(state==='ok'){
+    dot.style.background='#1D9E75';
+    pill.innerHTML='<span class="db-dot" style="background:#1D9E75"></span> DB Connected';
+  } else if(state==='connecting'){
+    dot.style.background='#E8A830';
+    pill.innerHTML='<span class="db-dot" style="background:#E8A830"></span> Connecting…';
+  } else {
+    dot.style.background='#A32D2D';
+    pill.innerHTML='<span class="db-dot" style="background:#A32D2D"></span> DB Offline (local)';
+  }
+}
+
+async function loadProductsFromDB(){
+  try {
+    const res = await fetch(`${API}/products`);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const products = await res.json();
+    console.log('[DB] Raw products from API:', products);
+    INVENTORY = {};
+    products.forEach(p => {
+      INVENTORY[p.id] = {
+        name: p.name, category: p.category,
+        stock: Number(p.stock), parLevel: Number(p.parLevel),
+        price: Number(p.price), expiry: p.expiry || '—',
+        lastRestocked: p.lastRestocked || '—',
+        icon: iconFor(p.id, p.category)
+      };
+    });
+    console.log('[DB] INVENTORY loaded:', Object.keys(INVENTORY).length, 'products');
+    orderCount = 1;
+    setDbStatus('ok');
+    showToast('✓ Loaded '+products.length+' products from database');
+  } catch(e){
+    console.warn('[API] Could not reach backend, using local seed data:', e.message);
+    setDbStatus('offline');
+    showToast('⚠ Backend offline — using local data');
+    // Fallback to local seed so UI still works without the Java server
+    INVENTORY = {
+      "101":{ name:"Jasmine Rice 5k",  category:"Grains", stock:20, parLevel:5,  price:250.00, expiry:"2027-12-01", lastRestocked:"—", icon:"🌾" },
+      "102":{ name:"Brown Rice 2k",    category:"Grains", stock:15, parLevel:3,  price:180.00, expiry:"2027-10-15", lastRestocked:"—", icon:"🌾" },
+      "103":{ name:"White Bread",      category:"Grains", stock:10, parLevel:2,  price:65.00,  expiry:"2026-03-31", lastRestocked:"—", icon:"🍞" },
+      "104":{ name:"Spaghetti Pasta",  category:"Grains", stock:25, parLevel:5,  price:45.00,  expiry:"2028-01-20", lastRestocked:"—", icon:"🍝" },
+      "105":{ name:"Oatmeal 1kg",      category:"Grains", stock:12, parLevel:4,  price:120.00, expiry:"2027-05-12", lastRestocked:"—", icon:"🥣" },
+      "201":{ name:"Fresh Milk 1L",    category:"Dairy",  stock:12, parLevel:4,  price:85.00,  expiry:"2026-04-05", lastRestocked:"—", icon:"🥛" },
+      "202":{ name:"Cheddar Cheese",   category:"Dairy",  stock:30, parLevel:10, price:55.00,  expiry:"2026-06-15", lastRestocked:"—", icon:"🧀" },
+      "203":{ name:"Salted Butter",    category:"Dairy",  stock:15, parLevel:5,  price:95.00,  expiry:"2026-09-20", lastRestocked:"—", icon:"🧈" },
+      "204":{ name:"Greek Yogurt",     category:"Dairy",  stock:8,  parLevel:2,  price:110.00, expiry:"2026-04-10", lastRestocked:"—", icon:"🫙" },
+      "205":{ name:"Heavy Cream",      category:"Dairy",  stock:10, parLevel:3,  price:150.00, expiry:"2026-05-01", lastRestocked:"—", icon:"🥛" },
+      "301":{ name:"Canned Tuna",      category:"Canned", stock:50, parLevel:10, price:35.50,  expiry:"2028-11-30", lastRestocked:"—", icon:"🥫" },
+      "302":{ name:"Corned Beef",      category:"Canned", stock:40, parLevel:8,  price:48.00,  expiry:"2029-02-14", lastRestocked:"—", icon:"🥫" },
+      "303":{ name:"Sardines",         category:"Canned", stock:60, parLevel:15, price:22.00,  expiry:"2028-08-22", lastRestocked:"—", icon:"🐟" },
+      "304":{ name:"Green Peas",       category:"Canned", stock:30, parLevel:5,  price:28.00,  expiry:"2028-05-10", lastRestocked:"—", icon:"🫛" },
+      "305":{ name:"Condensed Milk",   category:"Canned", stock:25, parLevel:5,  price:62.00,  expiry:"2027-12-25", lastRestocked:"—", icon:"🥛" },
+      "401":{ name:"Potato Chips",     category:"Snacks", stock:40, parLevel:10, price:42.00,  expiry:"2026-08-15", lastRestocked:"—", icon:"🥔" },
+      "402":{ name:"Chocolate Bar",    category:"Snacks", stock:50, parLevel:12, price:35.00,  expiry:"2027-01-10", lastRestocked:"—", icon:"🍫" },
+      "403":{ name:"Mixed Nuts",       category:"Snacks", stock:20, parLevel:5,  price:85.00,  expiry:"2026-11-05", lastRestocked:"—", icon:"🥜" },
+      "404":{ name:"Biscuits Pack",    category:"Snacks", stock:45, parLevel:10, price:15.00,  expiry:"2026-12-20", lastRestocked:"—", icon:"🍪" },
+      "405":{ name:"Gummy Bears",      category:"Snacks", stock:30, parLevel:5,  price:25.00,  expiry:"2027-03-15", lastRestocked:"—", icon:"🐻" },
+    };
+  }
+  renderProducts();
+}
+
+function now(){ return new Date().toLocaleString('en-PH'); }
+
+// ════════════ CART FAB / DRAWER ════════════
+function openCart(){
+  document.getElementById('cart-overlay').classList.add('open');
+  document.getElementById('cart-drawer').classList.add('open');
+}
+function closeCart(){
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-drawer').classList.remove('open');
+}
+
+// ════════════ NAVIGATION ════════════
+function switchView(view, navEl){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  if(navEl) navEl.classList.add('active');
+  document.getElementById('topbar-title').textContent={
+    register:'Register',inventory:'Inventory',sales:'Sales History',
+    'restock-log':'Restock Log',timelog:'Time Logs',audit:'Audit Trail',
+    'my-orders':'My Orders'
+  }[view]||view;
+  const isRegister = view==='register';
+  document.getElementById('search-bar').style.display=isRegister?'':'none';
+  // FAB only on register
+  document.getElementById('cart-fab').style.display=isRegister?'flex':'none';
+  if(!isRegister) closeCart();
+  if(view==='inventory') renderInventory();
+  if(view==='sales') renderSales();
+  if(view==='restock-log') renderRestockLog();
+  if(view==='timelog') renderTimeLog();
+  if(view==='audit') renderAuditTrail();
+  if(view==='my-orders') renderMyOrders();
+}
+
+function requireLogin(view,navEl){
+  if(currentUser){ switchView(view,navEl); }
+  else{ pendingView={view,navEl}; openLoginModal(); }
+}
+
+// ════════════ PRODUCTS ════════════
+function getVisible(){
+  return Object.entries(INVENTORY).filter(([id,p])=>{
+    const catOk=activeCat==='All'||p.category===activeCat;
+    const sq=searchQ.toLowerCase();
+    const searchOk=!sq||p.name.toLowerCase().includes(sq)||id.includes(sq);
+    return catOk&&searchOk;
+  });
+}
+
+function renderProducts(){
+  const grid=document.getElementById('prod-grid');
+  const prods=getVisible();
+  if(!prods.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted);font-size:13px"><i class="ti ti-search-off" style="font-size:36px;display:block;margin-bottom:10px;opacity:.3"></i>No products found</div>';
+    return;
+  }
+  grid.innerHTML=prods.map(([id,p])=>{
+    const low=p.stock<=p.parLevel, out=p.stock===0;
+    return `<div class="prod-card${out?' out':''}" onclick="addToCart('${id}')">
+      ${low&&!out?'<span class="low-badge">Low Stock</span>':''}
+      ${out?'<span class="low-badge" style="color:var(--danger)">Out of Stock</span>':''}
+      <span class="prod-icon">${p.icon}</span>
+      <div class="prod-id">${id}</div>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-price">₱${p.price.toFixed(2)}</div>
+      <div class="prod-stock">${p.stock} in stock</div>
+      <div class="prod-expiry">Exp: ${p.expiry}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterCat(cat,btn){
+  activeCat=cat; searchQ='';
+  document.getElementById('search-input').value='';
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('prod-section-label').textContent=cat==='All'?'All Products':cat;
+  renderProducts();
+}
+function filterProducts(q){
+  searchQ=q; activeCat='All';
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.cat-btn').classList.add('active');
+  renderProducts();
+}
+
+// ════════════ CART ════════════
+function addToCart(id){
+  const p=INVENTORY[id];
+  if(!p||p.stock<=0){showToast('⚠ Out of stock');return;}
+  if((cart[id]||0)>=p.stock){showToast('⚠ Max stock reached');return;}
+  cart[id]=(cart[id]||0)+1;
+  p.stock--;
+  renderCart(); renderProducts(); updateFab();
+  showToast(`✓ ${p.name} added`);
+  // Auto-open cart on first add
+  if(Object.keys(cart).length===1) openCart();
+}
+
+function changeQty(id,delta){
+  const p=INVENTORY[id];
+  if(!cart[id]) return;
+  cart[id]+=delta;
+  if(delta<0) p.stock++;
+  else p.stock--;
+  if(cart[id]<=0) delete cart[id];
+  renderCart(); renderProducts(); updateFab();
+}
+
+function updateFab(){
+  const total=Object.values(cart).reduce((s,v)=>s+v,0);
+  const badge=document.getElementById('fab-badge');
+  badge.textContent=total;
+  badge.classList.toggle('show',total>0);
+}
+
+function renderCart(){
+  const ids=Object.keys(cart);
+  document.getElementById('cart-badge').textContent=ids.length+(ids.length===1?' item':' items');
+  document.getElementById('order-meta').textContent='Order #'+String(orderCount).padStart(4,'0');
+  const body=document.getElementById('cart-body');
+  if(!ids.length){
+    body.innerHTML=`<div class="empty-state"><i class="ti ti-basket"></i><p>Cart is empty</p><span>Click a product to add</span></div>`;
+    updateTotals(0);
+    document.getElementById('checkout-btn').disabled=true;
+    return;
+  }
+  let sub=0;
+  body.innerHTML=ids.map(id=>{
+    const p=INVENTORY[id], qty=cart[id];
+    sub+=p.price*qty;
+    return `<div class="cart-item">
+      <span class="ci-icon">${p.icon}</span>
+      <div class="ci-info">
+        <div class="ci-name">${p.name}</div>
+        <div class="ci-sub">₱${p.price.toFixed(2)} × ${qty} = ₱${(p.price*qty).toFixed(2)}</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qb" onclick="changeQty('${id}',-1)">−</button>
+        <span class="qn">${qty}</span>
+        <button class="qb" onclick="changeQty('${id}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateTotals(sub);
+  document.getElementById('checkout-btn').disabled=false;
+}
+
+function updateTotals(sub){
+  let disc=0;
+  if(activeDisc==='PWD'||activeDisc==='Senior') disc=sub*0.2;
+  const total=sub-disc;
+  document.getElementById('tot-sub').textContent='₱'+sub.toFixed(2);
+  document.getElementById('tot-total').textContent='₱'+total.toFixed(2);
+  const dr=document.getElementById('tot-disc-row');
+  if(disc>0){
+    dr.style.display='flex';
+    document.getElementById('tot-disc-label').textContent=activeDisc+' Discount (20%)';
+    document.getElementById('tot-disc-val').textContent='-₱'+disc.toFixed(2);
+  } else { dr.style.display='none'; }
+}
+
+function getTotal(){
+  let sub=Object.keys(cart).reduce((s,id)=>s+INVENTORY[id].price*cart[id],0);
+  let disc=(activeDisc==='PWD'||activeDisc==='Senior')?sub*0.2:0;
+  return {sub,disc,total:sub-disc};
+}
+
+// ════════════ DISCOUNTS ════════════
+function toggleDisc(type){
+  activeDisc=type;
+  ['pwd','senior'].forEach(k=>document.getElementById('db-'+k).classList.remove('active'));
+  document.getElementById('db-none').classList.remove('active');
+  if(type==='PWD') document.getElementById('db-pwd').classList.add('active');
+  else if(type==='Senior') document.getElementById('db-senior').classList.add('active');
+  else document.getElementById('db-none').classList.add('active');
+  renderCart();
+}
+
+// ════════════ PAYMENT ════════════
+function setPayment(method){
+  payMethod=method;
+  ['Cash','Card','GCash','Other'].forEach(m=>{
+    const btn=document.getElementById('pay-'+m.toLowerCase());
+    if(btn) btn.classList.toggle('active',payMethod===m);
+  });
+  document.getElementById('cash-fields').style.display=method==='Cash'?'block':'none';
+  document.getElementById('digital-fields').style.display=(method==='Card'||method==='GCash')?'block':'none';
+  if(method==='Card') document.getElementById('account-info').placeholder='Card Number (11 digits)';
+  if(method==='GCash') document.getElementById('account-info').placeholder='GCash Number (09XXXXXXXXX)';
+  document.getElementById('cash-tendered').value='';
+  document.getElementById('change-line').textContent='';
+  document.getElementById('account-info').value='';
+}
+
+function calcChange(){
+  const {total}=getTotal();
+  const tendered=parseFloat(document.getElementById('cash-tendered').value)||0;
+  const cl=document.getElementById('change-line');
+  if(tendered>=total&&total>0){
+    cl.textContent=`Change: ₱${(tendered-total).toFixed(2)}`;
+    cl.style.color='var(--success)';
+  } else if(tendered>0){
+    cl.textContent=`Short by ₱${(total-tendered).toFixed(2)}`;
+    cl.style.color='var(--danger)';
+  } else { cl.textContent=''; }
+}
+
+// ════════════ CHECKOUT ════════════
+async function checkout(){
+  const ids=Object.keys(cart);
+  if(!ids.length) return;
+  const {sub,disc,total}=getTotal();
+  if(payMethod==='Cash'){
+    const tendered=parseFloat(document.getElementById('cash-tendered').value)||0;
+    if(tendered<total){showToast('✘ Insufficient cash amount');return;}
+  }
+  if((payMethod==='Card'||payMethod==='GCash')&&!document.getElementById('account-info').value.trim()){
+    showToast('✘ Please enter account/card number');return;
+  }
+  const cashTendered = payMethod==='Cash' ? parseFloat(document.getElementById('cash-tendered').value)||0 : null;
+  const accountInfo  = document.getElementById('account-info').value.trim()||null;
+
+  const items = ids.map(id=>({
+    productId: id,
+    productName: INVENTORY[id].name,
+    qty: cart[id],
+    unitPrice: INVENTORY[id].price,
+    newStock: INVENTORY[id].stock,          // already decremented locally
+    lastRestocked: INVENTORY[id].lastRestocked
+  }));
+
+  const payload = {
+    subtotal: sub, discountType: activeDisc, discountIdNumber: null,
+    discountAmount: disc, total,
+    paymentMethod: payMethod, accountInfo,
+    cashTendered, changeAmount: cashTendered!=null ? cashTendered-total : null,
+    customerId: currentCustomer ? currentCustomer.customerId : -1,
+    items
+  };
+
+  let savedOrderId = orderCount;
+  try {
+    const res = await fetch(`${API}/checkout`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Checkout failed');
+    savedOrderId = data.orderId || orderCount;
+  } catch(e){
+    console.warn('[API] Checkout error (continuing locally):', e.message);
+  }
+
+  // Build invoice string (mirrors getInvoiceString() from Java)
+  const cashTenderedVal = payMethod==='Cash' ? parseFloat(document.getElementById('cash-tendered').value)||0 : null;
+  const changeVal = cashTenderedVal != null ? cashTenderedVal - total : null;
+  let inv = '';
+  inv += '*** OFFICIAL INVOICE ***\n';
+  inv += 'Order #: ' + String(savedOrderId).padStart(4,'0') + '\n';
+  inv += 'Date   : ' + new Date().toLocaleString('en-PH') + '\n';
+  inv += '─'.repeat(38) + '\n';
+  ids.forEach(id => {
+    const p = INVENTORY[id]; const qty = cart[id];
+    inv += (p.name).padEnd(22) + ' x' + String(qty).padEnd(4) + ' ₱' + (p.price*qty).toFixed(2) + '\n';
+  });
+  inv += '─'.repeat(38) + '\n';
+  inv += 'SUBTOTAL      : ₱' + sub.toFixed(2) + '\n';
+  if(disc>0) inv += 'DISCOUNT (' + activeDisc + '): -₱' + disc.toFixed(2) + '\n';
+  inv += 'TOTAL         : ₱' + total.toFixed(2) + '\n';
+  inv += 'PAYMENT       : ' + payMethod + '\n';
+  if(cashTenderedVal!=null){
+    inv += 'CASH TENDERED : ₱' + cashTenderedVal.toFixed(2) + '\n';
+    inv += 'CHANGE        : ₱' + changeVal.toFixed(2) + '\n';
+  } else if(accountInfo){
+    inv += 'ACCOUNT NO    : ' + accountInfo + '\n';
+  }
+  inv += '*'.repeat(38);
+
+  // Build structured invoice object for the new receipt
+  const invObj = {
+    orderId: savedOrderId,
+    sub, disc, total,
+    discType: activeDisc || 'None',
+    payment: payMethod,
+    accountInfo,
+    cashTendered: cashTenderedVal,
+    items: ids.map(id => ({
+      name: INVENTORY[id].name, icon: INVENTORY[id].icon,
+      qty: cart[id], unitPrice: INVENTORY[id].price
+    })),
+    customerName: currentCustomer ? currentCustomer.name : 'Guest'
+  };
+  showInvoice(invObj);
+
+  const itemCount=ids.reduce((s,id)=>s+cart[id],0);
+  totalRevenue+=total; totalItems+=itemCount; sessionOrders++; totalDiscounts+=disc;
+  orderCount++;
+  document.getElementById('ss-revenue').textContent='₱'+totalRevenue.toFixed(2);
+  document.getElementById('ss-orders').textContent=sessionOrders+' orders';
+  document.getElementById('ss-avg').textContent='₱'+(totalRevenue/sessionOrders).toFixed(2);
+  document.getElementById('ss-disc').textContent='₱'+totalDiscounts.toFixed(2);
+  document.getElementById('ss-items').textContent=totalItems;
+
+  cart={}; activeDisc=null;
+  document.querySelectorAll('.disc-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('cash-tendered').value='';
+  document.getElementById('change-line').textContent='';
+  document.getElementById('account-info').value='';
+  document.getElementById('cash-fields').style.display='none';
+  document.getElementById('digital-fields').style.display='none';
+  setPayment('Cash');
+  renderCart(); renderProducts(); updateFab();
+  closeCart();
+}
+
+// ════════════ INVENTORY ════════════
+function filterInvCat(cat,btn){
+  invCat=cat;
+  document.querySelectorAll('#inv-tabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderInventory();
+}
+function renderInventory(){
+  const tbody=document.getElementById('inv-tbody');
+  const entries=Object.entries(INVENTORY).filter(([,p])=>invCat==='All'||p.category===invCat);
+  tbody.innerHTML=entries.map(([id,p])=>{
+    const low=p.stock<=p.parLevel;
+    const sc=p.stock===0?'stock-out':low?'stock-low':'stock-ok';
+    const sl=p.stock===0?p.stock+' ✘':low?p.stock+' ⚠':p.stock;
+    return `<tr>
+      <td class="mono">${id}</td>
+      <td>${p.icon} ${p.name}</td>
+      <td><span class="cat-tag cat-${p.category}">${p.category}</span></td>
+      <td class="mono">₱${p.price.toFixed(2)}</td>
+      <td class="${sc} mono">${sl}</td>
+      <td class="mono">${p.parLevel}</td>
+      <td class="mono">${p.expiry}</td>
+      <td class="mono">${p.lastRestocked}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════ RESTOCK ════════════
+function populateRestockSelect(){
+  const sel=document.getElementById('restock-id');
+  sel.innerHTML='<option value="">— Select Product —</option>';
+  Object.entries(INVENTORY).forEach(([id,p])=>{
+    const opt=document.createElement('option');
+    opt.value=id; opt.textContent=`${id} — ${p.name} (${p.category})`;
+    sel.appendChild(opt);
+  });
+}
+function fillRestockInfo(){
+  const id=document.getElementById('restock-id').value;
+  const p=INVENTORY[id];
+  document.getElementById('restock-current').value=p?`${p.stock} units (par: ${p.parLevel})`:'';
+}
+function openRestockModal(){
+  if(!currentUser){showToast('✘ Staff login required');return;}
+  document.getElementById('restock-modal').classList.add('open');
+}
+function closeRestockModal(){
+  document.getElementById('restock-modal').classList.remove('open');
+  document.getElementById('restock-id').value='';
+  document.getElementById('restock-current').value='';
+  document.getElementById('restock-qty').value='';
+}
+async function doRestock(){
+  const id=document.getElementById('restock-id').value;
+  const qty=parseInt(document.getElementById('restock-qty').value);
+  if(!id){showToast('✘ Select a product');return;}
+  if(!qty||qty<1){showToast('✘ Enter a valid quantity');return;}
+  const p=INVENTORY[id], oldStock=p.stock;
+  p.stock+=qty; p.lastRestocked=now();
+
+  try {
+    await fetch(`${API}/restock`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({productId:id,productName:p.name,added:qty,
+        oldStock,newStock:p.stock,role:currentUser.role,lastRestocked:p.lastRestocked})
+    });
+  } catch(e){ console.warn('[API] Restock save failed (local only):', e.message); }
+
+  try {
+    await fetch(`${API}/time-log`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({role:currentUser.role,name:currentUser.name,action:'RESTOCK'})
+    });
+  } catch(e){}
+
+  showToast(`✓ ${p.name}: ${oldStock} → ${p.stock}`);
+  closeRestockModal();
+  renderInventory(); renderProducts(); populateRestockSelect();
+}
+
+// ════════════ SALES / LOG RENDERERS — pull from DB ════════════
+async function renderSales(){
+  const tbody=document.getElementById('sales-tbody');
+  tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+
+  try {
+    const res=await fetch(`${API}/orders`);
+    const orders=await res.json();
+
+    // ── Calculate ALL-TIME totals from DB ──
+    let dbRevenue=0, dbDisc=0, dbOrders=orders.length;
+    orders.forEach(o=>{ dbRevenue+=(+o.total); dbDisc+=(+o.discountAmount); });
+
+    // ── Fetch real item totals from /api/orders/stats ──
+    let dbItems = totalItems;
+    try {
+      const statsRes = await fetch(`${API}/orders/stats`);
+      if(statsRes.ok){
+        const stats = await statsRes.json();
+        dbRevenue  = stats.totalRevenue;
+        dbDisc     = stats.totalDiscount;
+        dbOrders   = stats.totalOrders;
+        dbItems    = stats.totalItems;
+      }
+    } catch(e){}
+
+    const displayAvg = dbOrders > 0 ? dbRevenue / dbOrders : 0;
+    document.getElementById('ss-revenue').textContent='₱'+dbRevenue.toFixed(2);
+    document.getElementById('ss-orders').textContent=dbOrders+' order'+(dbOrders!==1?'s':'');
+    document.getElementById('ss-avg').textContent='₱'+displayAvg.toFixed(2);
+    document.getElementById('ss-disc').textContent='₱'+dbDisc.toFixed(2);
+    document.getElementById('ss-items').textContent=dbItems;
+
+    if(!orders.length){
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No orders in database</td></tr>';
+      return;
+    }
+    allSalesRows = orders.map(o=>`<tr>
+      <td class="mono">#${String(o.orderId).padStart(4,'0')}</td>
+      <td class="mono" style="font-size:11px">${o.orderDate||'—'}</td>
+      <td class="mono">₱${(+o.subtotal).toFixed(2)}</td>
+      <td class="mono" style="color:var(--accent2)">-₱${(+o.discountAmount).toFixed(2)}</td>
+      <td class="mono" style="font-weight:600">₱${(+o.total).toFixed(2)}</td>
+      <td>${o.paymentMethod||'—'}</td>
+      <td><span class="cat-tag" style="background:${o.discountType?'#EFF4FB':'var(--bg)'};color:${o.discountType?'var(--accent)':'var(--muted)'}">${o.discountType||'None'}</span></td>
+    </tr>`);
+    // Apply any active search filter
+    const sq = (document.getElementById('sales-search')||{}).value||'';
+    tbody.innerHTML = sq ? allSalesRows.filter(r=>r.toLowerCase().includes(sq.toLowerCase())).join('') : allSalesRows.join('');
+  } catch(e){
+    // Fallback to session-only stats if DB unreachable
+    document.getElementById('ss-revenue').textContent='₱'+totalRevenue.toFixed(2);
+    document.getElementById('ss-orders').textContent=sessionOrders+' orders';
+    document.getElementById('ss-avg').textContent='₱'+(sessionOrders?totalRevenue/sessionOrders:0).toFixed(2);
+    document.getElementById('ss-disc').textContent='₱'+totalDiscounts.toFixed(2);
+    document.getElementById('ss-items').textContent=totalItems;
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+  }
+}
+
+async function renderRestockLog(){
+  const tbody=document.getElementById('restock-tbody');
+  tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+  try {
+    const res=await fetch(`${API}/restock-log`);
+    const rows=await res.json();
+    if(!rows.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No restock records</td></tr>';return;}
+    tbody.innerHTML=rows.map(r=>`<tr>
+      <td class="mono" style="font-size:11px">${r.logDate||'—'}</td>
+      <td class="mono">${r.productId}</td>
+      <td>${r.productName}</td>
+      <td class="mono" style="color:var(--success);font-weight:600">+${r.quantityAdded}</td>
+      <td class="mono">${r.oldStock}</td>
+      <td class="mono" style="font-weight:600">${r.newStock}</td>
+      <td>${r.restockedBy}</td>
+    </tr>`).join('');
+  } catch(e){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+  }
+}
+
+async function renderTimeLog(){
+  const tbody=document.getElementById('timelog-tbody');
+  tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+  try {
+    const res=await fetch(`${API}/time-log`);
+    const rows=await res.json();
+    if(!rows.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">No time log records</td></tr>';return;}
+    tbody.innerHTML=rows.map(r=>`<tr>
+      <td class="mono" style="font-size:11px">${r.logTime||'—'}</td>
+      <td>${r.role}</td><td>${r.name}</td>
+      <td style="color:${r.action==='LOGIN'?'var(--success)':'var(--accent)'};font-weight:600">${r.action}</td>
+    </tr>`).join('');
+  } catch(e){
+    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+  }
+}
+
+async function renderAuditTrail(){
+  const tbody=document.getElementById('audit-tbody');
+  tbody.innerHTML='<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+  // Color map covers both new event types and legacy MIGRATED_ prefixed ones
+  function auditColor(type){
+    if(!type) return 'var(--mid)';
+    const t = type.toUpperCase();
+    if(t.includes('SALE') || t.includes('ORDER'))    return 'var(--success)';
+    if(t.includes('RESTOCK'))                        return 'var(--accent)';
+    if(t.includes('LOGIN') && !t.includes('FAILED')) return 'var(--accent2)';
+    if(t.includes('LOGOUT'))                         return 'var(--mid)';
+    if(t.includes('FAILED'))                         return 'var(--danger)';
+    if(t.includes('PASSWORD'))                       return 'var(--warn)';
+    if(t.includes('TIMELOG'))                        return 'var(--accent2)';
+    return 'var(--muted)';
+  }
+  try {
+    const res=await fetch(`${API}/audit-trail`);
+    const rows=await res.json();
+    if(!rows.length){tbody.innerHTML='<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted)">No audit records</td></tr>';return;}
+    tbody.innerHTML=rows.map(r=>`<tr>
+      <td class="mono" style="font-size:11px">${r.createdAt||'—'}</td>
+      <td><span style="font-size:11px;font-weight:600;color:${auditColor(r.eventType)}">${r.eventType||'—'}</span></td>
+      <td style="font-size:12px">${r.details||''}</td>
+    </tr>`).join('');
+  } catch(e){
+    tbody.innerHTML='<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+  }
+}
+
+// ════════════ AUTH ════════════
+function openLoginModal(){
+  document.getElementById('login-modal').classList.add('open');
+  document.getElementById('login-pw').value='';
+  document.getElementById('login-err').style.display='none';
+  setTimeout(()=>document.getElementById('login-pw').focus(),100);
+}
+function closeLoginModal(){
+  document.getElementById('login-modal').classList.remove('open');
+  pendingView=null;
+}
+async function doLogin(){
+  const pw=document.getElementById('login-pw').value;
+  let user=null;
+  if(pw===PASSWORDS.admin) user={name:'Admin',role:'Manager'};
+  else if(pw===PASSWORDS.employee) user={name:'Employee',role:'Employee'};
+  if(user){
+    currentUser=user;
+    try {
+      await fetch(`${API}/time-log`,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({role:user.role,name:user.name,action:'LOGIN'})});
+    } catch(e){}
+    document.getElementById('staff-footer').style.display='flex';
+    document.getElementById('staff-avatar').textContent=user.role[0];
+    document.getElementById('staff-name-display').textContent=user.name;
+    document.getElementById('staff-role-display').textContent=user.role+' — Logged in';
+    document.getElementById('nav-login-btn').style.display='none';
+    document.getElementById('nav-logout-btn').style.display='flex';
+    closeLoginModal();
+    showToast(`✓ Welcome, ${user.name}! (${user.role})`);
+    if(pendingView){switchView(pendingView.view,pendingView.navEl);pendingView=null;}
+  } else {
+    document.getElementById('login-err').style.display='block';
+    try {
+      await fetch(`${API}/time-log`,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({role:'Unknown',name:'Unknown',action:'FAILED_LOGIN'})});
+    } catch(e){}
+  }
+}
+async function logout(){
+  if(!currentUser) return;
+  try {
+    await fetch(`${API}/time-log`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({role:currentUser.role,name:currentUser.name,action:'LOGOUT'})});
+  } catch(e){}
+  showToast(`Goodbye, ${currentUser.name}!`);
+  currentUser=null;
+  document.getElementById('staff-footer').style.display='none';
+  document.getElementById('nav-login-btn').style.display='flex';
+  document.getElementById('nav-logout-btn').style.display='none';
+  switchView('register',document.querySelector('.nav-item'));
+}
+
+// ════════════ CUSTOMER AUTH ════════════
+let currentCustomer = null; // { customerId, name, email }
+
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('auth-login-form').style.display = tab==='login' ? '' : 'none';
+  document.getElementById('auth-register-form').style.display = tab==='register' ? '' : 'none';
+}
+
+async function doCustomerLogin(){
+  const email = document.getElementById('cust-login-email').value.trim();
+  const pass  = document.getElementById('cust-login-pass').value;
+  const err   = document.getElementById('login-cust-err');
+  err.style.display = 'none';
+  if(!email||!pass){ err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
+  try {
+    const res = await fetch(`${API}/customer/login`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Login failed');
+    setCustomer(data);
+    dismissAuthSplash();
+  } catch(e){
+    err.textContent = e.message || 'Invalid email or password.';
+    err.style.display = 'block';
+  }
+}
+
+async function doCustomerRegister(){
+  const name  = document.getElementById('cust-reg-name').value.trim();
+  const email = document.getElementById('cust-reg-email').value.trim();
+  const pass  = document.getElementById('cust-reg-pass').value;
+  const err   = document.getElementById('register-cust-err');
+  err.style.display = 'none';
+  if(!name||!email||!pass){ err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
+  try {
+    const res = await fetch(`${API}/customer/register`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,email,password:pass})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Registration failed');
+    setCustomer(data);
+    dismissAuthSplash();
+    showToast('✓ Account created! Welcome, '+data.name+'!');
+  } catch(e){
+    err.textContent = e.message || 'Registration failed.';
+    err.style.display = 'block';
+  }
+}
+
+function guestMode(){
+  currentCustomer = null;
+  dismissAuthSplash();
+  showToast('Browsing as guest');
+}
+
+function setCustomer(data){
+  currentCustomer = { customerId: data.customerId, name: data.name, email: data.email };
+  document.getElementById('cust-avatar').textContent = data.name.charAt(0).toUpperCase();
+  document.getElementById('cust-name-badge').textContent = data.name;
+  document.getElementById('customer-badge-wrap').style.display = '';
+  document.getElementById('nav-my-orders').style.display = 'flex';
+}
+
+function dismissAuthSplash(){
+  const splash = document.getElementById('auth-splash');
+  splash.style.opacity = '0';
+  splash.style.transform = 'scale(1.03)';
+  splash.style.transition = 'opacity .3s, transform .3s';
+  setTimeout(()=>{ splash.style.display='none'; },300);
+}
+
+function signOutCustomer(){
+  currentCustomer = null;
+  document.getElementById('customer-badge-wrap').style.display = 'none';
+  document.getElementById('nav-my-orders').style.display = 'none';
+  switchView('register', document.querySelector('.nav-item'));
+  // Show splash again
+  const splash = document.getElementById('auth-splash');
+  splash.style.display = 'flex';
+  splash.style.opacity = '1';
+  splash.style.transform = 'none';
+  showToast('Signed out successfully');
+}
+
+function showMyOrders(){
+  const navEl = document.getElementById('nav-my-orders');
+  switchView('my-orders', navEl);
+}
+
+async function renderMyOrders(){
+  const container = document.getElementById('my-orders-content');
+  if(!currentCustomer){ 
+    container.innerHTML = '<div class="my-orders-empty"><i class="ti ti-user-off"></i><p>Not signed in</p><span>Sign in to view your orders</span></div>';
+    return;
+  }
+  document.getElementById('my-orders-title').textContent = currentCustomer.name + "'s Order History";
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Loading…</div>';
+  try {
+    const res = await fetch(`${API}/customer/orders?customerId=${currentCustomer.customerId}`);
+    const orders = await res.json();
+    if(!orders.length){
+      container.innerHTML = '<div class="my-orders-empty"><i class="ti ti-receipt-off"></i><p>No orders yet</p><span>Your completed orders will appear here after checkout</span></div>';
+      return;
+    }
+    container.innerHTML = orders.map(o=>`
+      <div class="order-card" onclick="viewOrderItems(${o.orderId})">
+        <div class="order-card-head">
+          <span class="order-card-num">#${String(o.orderId).padStart(4,'0')}</span>
+          <span class="order-card-date">${o.orderDate||'—'}</span>
+        </div>
+        <div class="order-card-total">₱${(+o.total).toFixed(2)}</div>
+        <div class="order-card-meta">
+          <span class="order-pill"><i class="ti ti-cash" style="font-size:11px"></i> ${o.paymentMethod||'—'}</span>
+          ${o.discountType ? '<span class="order-pill" style="color:var(--accent2);border-color:var(--accent2)">'+o.discountType+' -₱'+(+o.discountAmount).toFixed(2)+'</span>' : ''}
+          <span class="order-pill" style="color:var(--success);border-color:var(--success)">✓ Completed</span>
+        </div>
+      </div>`).join('');
+  } catch(e){
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger)">⚠ Cannot load orders</div>';
+  }
+}
+
+async function viewOrderItems(orderId){
+  try {
+    const res = await fetch(`${API}/order-items?orderId=${orderId}`);
+    const items = await res.json();
+    // Show invoice for historical order
+    const order = { orderId, sub:0, disc:0, total:0, discType:'—', payment:'—', accountInfo:null, cashTendered:null,
+      customerName: currentCustomer?currentCustomer.name:'Guest',
+      items: items.map(i=>({name:i.productName,icon:'📦',qty:i.quantity,unitPrice:i.unitPrice}))
+    };
+    items.forEach(i=>{ order.sub += i.unitPrice*i.quantity; order.total += i.subtotal; });
+    showInvoice(order);
+  } catch(e){ showToast('⚠ Could not load order details'); }
+}
+
+// ════════════ INVOICE MODAL ════════════
+function showInvoice(inv){
+  document.getElementById('invoice-modal').classList.add('open');
+  window._lastInvoice = inv;
+  document.getElementById('receipt-render').innerHTML = buildReceiptHTML(inv);
+}
+
+function buildReceiptHTML(inv){
+  const orderNum = String(inv.orderId).padStart(4,'0');
+  const dateStr = new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
+  const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet'};
+  const payIcon = payIcons[inv.payment] || 'ti-wallet';
+
+  // Varied barcode bars
+  const bHeights = [28,14,36,20,28,12,32,18,26,10,34,22,28,16,32,14,26,20,34,12,30,18,28,16,36,20,24,14,32,18];
+  const barcode = bHeights.map(h=>`<span style="height:${h}px"></span>`).join('');
+
+  const itemRows = (inv.items||[]).map(it=>`
+    <div class="r-item">
+      <div class="r-item-icon-wrap">${it.icon||'📦'}</div>
+      <div class="r-item-info">
+        <div class="r-item-name">${it.name}</div>
+        <div class="r-item-qty">${it.qty} unit${it.qty>1?'s':''} &times; ₱${(+it.unitPrice).toFixed(2)}</div>
+      </div>
+      <div class="r-item-price">₱${(it.qty*(+it.unitPrice)).toFixed(2)}</div>
+    </div>`).join('');
+
+  const discRow = inv.disc > 0
+    ? `<div class="r-tot-row disc"><span><i class="ti ti-discount-2" style="font-size:13px;vertical-align:-1px"></i> ${inv.discType} (20%)</span><span>-₱${(+inv.disc).toFixed(2)}</span></div>` : '';
+
+  const cashRows = inv.payment==='Cash' && inv.cashTendered
+    ? `<div class="r-tot-row" style="color:var(--mid)"><span>Cash Tendered</span><span>₱${(+inv.cashTendered).toFixed(2)}</span></div>
+       <div class="r-tot-row" style="color:var(--success);font-weight:600"><span>Change</span><span>₱${((+inv.cashTendered)-(+inv.total)).toFixed(2)}</span></div>` : '';
+
+  const acctInfo = inv.accountInfo
+    ? `<div class="pay-details"><div class="pay-method">${inv.payment}</div><div class="pay-info">${inv.accountInfo}</div></div>`
+    : `<div class="pay-details"><div class="pay-method">${inv.payment}</div><div class="pay-info">Transaction complete ✓</div></div>`;
+
+  const custRow = inv.customerName && inv.customerName !== 'Guest'
+    ? `<div class="receipt-meta-item" style="text-align:center"><div class="lbl">Customer</div><div class="val" style="font-size:12px">${inv.customerName}</div></div>` : '';
+
+  return `
+  <div class="receipt-top">
+    <div class="r-logo">🛒</div>
+    <div class="r-store">Tyrone's POS</div>
+    <div class="r-tagline">Official Receipt</div>
+    <div class="r-status-badge"><span class="r-status-dot"></span> Payment Confirmed</div>
+  </div>
+  <div class="receipt-divider"><span></span><div class="receipt-dashes"></div><span></span></div>
+  <div class="receipt-body">
+    <div class="receipt-meta">
+      <div class="receipt-meta-item"><div class="lbl">Order No.</div><div class="val">#${orderNum}</div></div>
+      ${custRow}
+      <div class="receipt-meta-item" style="text-align:right"><div class="lbl">Date</div><div class="val" style="font-size:11px;letter-spacing:0">${dateStr}</div></div>
+    </div>
+    <div class="receipt-items-label"><span>Items Purchased</span><span>Amount</span></div>
+    <div class="receipt-items">${itemRows}</div>
+    <div class="receipt-totals">
+      <div class="r-tot-row"><span>Subtotal</span><span>₱${(+inv.sub).toFixed(2)}</span></div>
+      ${discRow}
+      ${cashRows}
+      <div class="r-tot-row grand"><span>Total Paid</span><span>₱${(+inv.total).toFixed(2)}</span></div>
+    </div>
+    <div class="receipt-payment">
+      <div class="pay-icon-wrap"><i class="ti ${payIcon}"></i></div>
+      ${acctInfo}
+    </div>
+  </div>
+  <div class="receipt-divider"><span></span><div class="receipt-dashes"></div><span></span></div>
+  <div class="receipt-bottom">
+    <div class="thank-you">Thank you for shopping! 🙏</div>
+    <div class="r-note">We appreciate your business — see you again!</div>
+    <div class="r-barcode">${barcode}</div>
+    <div class="r-order-num">* ORDER-${orderNum} *</div>
+  </div>`;
+}
+
+function showInvoice(inv){
+  document.getElementById('receipt-render').innerHTML = buildReceiptHTML(inv);
+  document.getElementById('invoice-modal').classList.add('open');
+  window._lastInvoice = inv;
+}
+function closeInvoice(){
+  document.getElementById('invoice-modal').classList.remove('open');
+}
+function printInvoice(){
+  if(!window._lastInvoice) return;
+  const html = buildReceiptHTML(window._lastInvoice);
+  const w = window.open('','_blank','width=440,height=720');
+  w.document.write(`<!DOCTYPE html><html><head><title>Receipt #${String(window._lastInvoice.orderId).padStart(4,'0')}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--accent:#1A5DC8;--accent2:#2E7CF6;--dark:#0D1B3E;--mid:#3A5A8C;--muted:#7A96C2;--border:#C8D9F0;--border2:#E0ECFF;--bg:#EFF4FB;--success:#0F6E56;}
+    body{font-family:'Sora',sans-serif;background:#f0f4fb;display:flex;align-items:flex-start;justify-content:center;padding:20px;min-height:100vh}
+    .receipt{background:#fff;width:100%;max-width:380px;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(13,27,62,.12)}
+    .receipt-top{background:linear-gradient(150deg,#0D1B3E,#1A5DC8 60%,#2E7CF6);padding:28px 24px 20px;text-align:center;color:#fff;position:relative;overflow:hidden}
+    .receipt-top::before{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05)}
+    .r-logo{width:54px;height:54px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px;position:relative;z-index:1}
+    .r-store{font-size:19px;font-weight:700;margin-bottom:2px;position:relative;z-index:1}
+    .r-tagline{font-size:10px;opacity:.65;letter-spacing:2px;text-transform:uppercase;position:relative;z-index:1}
+    .r-status-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:10px;position:relative;z-index:1}
+    .r-status-dot{width:6px;height:6px;border-radius:50%;background:#4ADE80;flex-shrink:0}
+    .receipt-divider{display:flex;align-items:center;overflow:hidden;background:#fff}
+    .receipt-divider span{width:20px;height:20px;border-radius:50%;background:#f0f4fb;flex-shrink:0}
+    .receipt-divider span:first-child{margin-left:-10px}.receipt-divider span:last-child{margin-right:-10px}
+    .receipt-dashes{flex:1;border-top:2px dashed #C8D9F0;margin:0 3px}
+    .receipt-body{padding:20px 22px}
+    .receipt-meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding:12px 14px;background:#EFF4FB;border-radius:10px}
+    .lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A96C2;margin-bottom:2px}
+    .val{font-size:12.5px;font-weight:700;color:#0D1B3E;font-family:'JetBrains Mono',monospace}
+    .receipt-items-label{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A96C2;margin-bottom:8px;display:flex;justify-content:space-between}
+    .r-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #E0ECFF}
+    .r-item:last-child{border-bottom:none}
+    .r-item-icon-wrap{width:34px;height:34px;border-radius:8px;background:#EFF4FB;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .r-item-info{flex:1;min-width:0}
+    .r-item-name{font-size:12.5px;font-weight:600;color:#0D1B3E}
+    .r-item-qty{font-size:11px;color:#7A96C2}
+    .r-item-price{font-size:13px;font-weight:700;color:#1A5DC8;font-family:'JetBrains Mono',monospace}
+    .receipt-totals{background:#EFF4FB;border-radius:12px;padding:14px;margin-top:14px}
+    .r-tot-row{display:flex;justify-content:space-between;font-size:12.5px;color:#3A5A8C;padding:3px 0}
+    .r-tot-row.disc{color:#2E7CF6}
+    .r-tot-row.grand{font-size:17px;font-weight:800;color:#0D1B3E;border-top:2px solid #C8D9F0;padding-top:10px;margin-top:6px}
+    .receipt-payment{margin-top:14px;padding:12px 14px;background:linear-gradient(135deg,#EFF4FB,#E0ECFF);border:1.5px solid #C8D9F0;border-radius:12px;display:flex;align-items:center;gap:12px}
+    .pay-icon-wrap{width:38px;height:38px;border-radius:10px;background:#1A5DC8;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+    .pay-method{font-size:13px;font-weight:700;color:#0D1B3E}
+    .pay-info{font-size:11px;color:#7A96C2;font-family:'JetBrains Mono',monospace}
+    .receipt-bottom{padding:16px 22px 24px;text-align:center}
+    .thank-you{font-size:15px;font-weight:700;color:#0D1B3E;margin-bottom:4px}
+    .r-note{font-size:11.5px;color:#7A96C2;margin-bottom:16px}
+    .r-barcode{display:flex;justify-content:center;align-items:flex-end;gap:1.5px;margin-bottom:8px;height:34px}
+    .r-barcode span{display:inline-block;width:2.5px;background:#0D1B3E;border-radius:1px;opacity:.7}
+    .r-order-num{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#7A96C2;letter-spacing:2px}
+    @media print{body{background:#fff;padding:0}.receipt{box-shadow:none;border-radius:0;max-width:100%}}
+  </style></head><body>${html}</body></html>`);
+  w.document.close();
+  setTimeout(()=>{w.focus();w.print();},600);
+}
+
+// ════════════ SALES SEARCH FILTER ════════════
+let allSalesRows = []; // cache for filtering
+function filterSalesTable(q){
+  const tbody = document.getElementById('sales-tbody');
+  if(!allSalesRows.length) return;
+  const sq = q.toLowerCase().trim();
+  if(!sq){
+    tbody.innerHTML = allSalesRows.join('');
+    return;
+  }
+  const filtered = allSalesRows.filter(row => row.toLowerCase().includes(sq));
+  tbody.innerHTML = filtered.length
+    ? filtered.join('')
+    : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No matching transactions</td></tr>';
+}
+
+// ════════════ TOAST ════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+init();
+</script>
+</body>
+</html>
