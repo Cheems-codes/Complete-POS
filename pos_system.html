@@ -32,6 +32,10 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--dark);displa
 .nav-item:hover{background:rgba(46,124,246,.15);color:#EFF4FB}
 .nav-item.active{background:rgba(46,124,246,.22);color:#5BA4FF;font-weight:500}
 .staff-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
+.nav-sub{padding-left:22px;font-size:12.5px}
+.nav-login-wrap{padding:10px 10px 6px;border-top:1px solid rgba(255,255,255,.07)}
+.nav-login-wrap .nav-item{color:rgba(91,164,255,.85);border:1px solid rgba(91,164,255,.2);border-radius:9px;justify-content:center;gap:8px;font-size:13px}
+.nav-login-wrap .nav-item:hover{background:rgba(46,124,246,.2);color:#5BA4FF;border-color:rgba(91,164,255,.4)}
 .avatar{width:32px;height:32px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
 .staff-info .name{font-size:12.5px;color:#EFF4FB;font-weight:500}
 .staff-info .role{font-size:10.5px;color:var(--muted)}
@@ -373,17 +377,25 @@ tbody td{padding:10px 14px;color:var(--dark)}
   <div class="nav-section">
     <div class="nav-label">Shop</div>
     <div class="nav-item active" onclick="switchView('register',this)"><i class="ti ti-shopping-cart"></i> Register</div>
-    <div class="nav-label">Staff</div>
-    <div class="nav-item" id="nav-inventory" onclick="requireLogin('inventory',this)"><i class="ti ti-package"></i> Inventory</div>
-    <div class="nav-item" id="nav-sales" onclick="requireLogin('sales',this)"><i class="ti ti-chart-bar"></i> Sales History</div>
-    <div class="nav-item" id="nav-restock-log" onclick="requireLogin('restock-log',this)"><i class="ti ti-rotate-clockwise-2"></i> Restock Log</div>
-    <div class="nav-item" id="nav-timelog" onclick="requireLogin('timelog',this)"><i class="ti ti-clock"></i> Time Logs</div>
-    <div class="nav-item" id="nav-audit" onclick="requireLogin('audit',this)"><i class="ti ti-shield-check"></i> Audit Trail</div>
     <div class="nav-item" id="nav-my-orders" onclick="switchView('my-orders',this)" style="display:none"><i class="ti ti-clock-history"></i> My Orders</div>
 
-    <div class="nav-label">System</div>
+    <div class="nav-label">Staff</div>
+    <div class="nav-item" id="nav-staff-toggle" onclick="toggleStaffMenu()">
+      <i class="ti ti-layout-grid"></i> Staff Panel
+      <i class="ti ti-chevron-down" id="staff-chevron" style="margin-left:auto;font-size:13px;transition:.25s"></i>
+    </div>
+    <div id="staff-submenu" style="display:none">
+      <div class="nav-item nav-sub" id="nav-inventory" onclick="requireLogin('inventory',this)"><i class="ti ti-package"></i> Inventory</div>
+      <div class="nav-item nav-sub" id="nav-sales" onclick="requireLogin('sales',this)"><i class="ti ti-chart-bar"></i> Sales History</div>
+      <div class="nav-item nav-sub" id="nav-restock-log" onclick="requireLogin('restock-log',this)"><i class="ti ti-rotate-clockwise-2"></i> Restock Log</div>
+      <div class="nav-item nav-sub" id="nav-timelog" onclick="requireLogin('timelog',this)"><i class="ti ti-clock"></i> Time Logs</div>
+      <div class="nav-item nav-sub" id="nav-audit" onclick="requireLogin('audit',this)"><i class="ti ti-shield-check"></i> Audit Trail</div>
+      <div class="nav-item nav-sub" id="nav-logout-btn" style="display:none" onclick="logout()"><i class="ti ti-logout"></i> Logout</div>
+    </div>
+  </div>
+
+  <div class="nav-login-wrap" id="nav-login-wrap">
     <div class="nav-item" id="nav-login-btn" onclick="openLoginModal()"><i class="ti ti-lock"></i> Staff Login</div>
-    <div class="nav-item" id="nav-logout-btn" style="display:none" onclick="logout()"><i class="ti ti-logout"></i> Logout</div>
   </div>
   <div class="staff-footer" id="staff-footer" style="display:none">
     <div class="avatar" id="staff-avatar">?</div>
@@ -781,6 +793,14 @@ function closeCart(){
 }
 
 // ════════════ NAVIGATION ════════════
+function toggleStaffMenu(){
+  const menu = document.getElementById('staff-submenu');
+  const chevron = document.getElementById('staff-chevron');
+  const open = menu.style.display === 'block';
+  menu.style.display = open ? 'none' : 'block';
+  chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
 function switchView(view, navEl){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1320,8 +1340,10 @@ async function doLogin(){
     document.getElementById('staff-avatar').textContent=user.role[0];
     document.getElementById('staff-name-display').textContent=user.name;
     document.getElementById('staff-role-display').textContent=user.role+' — Logged in';
-    document.getElementById('nav-login-btn').style.display='none';
+    document.getElementById('nav-login-wrap').style.display='none';
     document.getElementById('nav-logout-btn').style.display='flex';
+    document.getElementById('staff-submenu').style.display='block';
+    document.getElementById('staff-chevron').style.transform='rotate(180deg)';
     closeLoginModal();
     showToast(`✓ Welcome, ${user.name}! (${user.role})`);
     if(pendingView){switchView(pendingView.view,pendingView.navEl);pendingView=null;}
@@ -1342,8 +1364,10 @@ async function logout(){
   showToast(`Goodbye, ${currentUser.name}!`);
   currentUser=null;
   document.getElementById('staff-footer').style.display='none';
-  document.getElementById('nav-login-btn').style.display='flex';
+  document.getElementById('nav-login-wrap').style.display='block';
   document.getElementById('nav-logout-btn').style.display='none';
+  document.getElementById('staff-submenu').style.display='none';
+  document.getElementById('staff-chevron').style.transform='rotate(0deg)';
   switchView('register',document.querySelector('.nav-item'));
 }
 
@@ -1472,37 +1496,28 @@ async function renderMyOrders(){
 
 async function viewOrderItems(orderId){
   try {
-    const [itemsRes, ordersRes] = await Promise.all([
-      fetch(`${API}/order-items?orderId=${orderId}`),
-      fetch(`${API}/orders`)
-    ]);
-    const items = await itemsRes.json();
-    const allOrders = await ordersRes.json();
-    const o = allOrders.find(x => x.orderId == orderId) || {};
-
-    const order = {
-      orderId,
-      sub:          o.subtotal       != null ? o.subtotal       : items.reduce((s,i)=> s + i.unitPrice*i.quantity, 0),
-      disc:         o.discountAmount != null ? o.discountAmount : 0,
-      total:        o.total          != null ? o.total          : items.reduce((s,i)=> s + i.subtotal, 0),
-      discType:     o.discountType   || '—',
-      payment:      o.paymentMethod  || '—',
-      accountInfo:  o.accountInfo    || null,
-      cashTendered: o.cashTendered   || null,
-      orderDate:    o.orderDate      || null,
-      customerName: currentCustomer  ? currentCustomer.name : 'Guest',
-      items: items.map(i=>({ name:i.productName, icon:'📦', qty:i.quantity, unitPrice:i.unitPrice }))
+    const res = await fetch(`${API}/order-items?orderId=${orderId}`);
+    const items = await res.json();
+    // Show invoice for historical order
+    const order = { orderId, sub:0, disc:0, total:0, discType:'—', payment:'—', accountInfo:null, cashTendered:null,
+      customerName: currentCustomer?currentCustomer.name:'Guest',
+      items: items.map(i=>({name:i.productName,icon:'📦',qty:i.quantity,unitPrice:i.unitPrice}))
     };
+    items.forEach(i=>{ order.sub += i.unitPrice*i.quantity; order.total += i.subtotal; });
     showInvoice(order);
   } catch(e){ showToast('⚠ Could not load order details'); }
 }
 
 // ════════════ INVOICE MODAL ════════════
+function showInvoice(inv){
+  document.getElementById('invoice-modal').classList.add('open');
+  window._lastInvoice = inv;
+  document.getElementById('receipt-render').innerHTML = buildReceiptHTML(inv);
+}
+
 function buildReceiptHTML(inv){
   const orderNum = String(inv.orderId).padStart(4,'0');
-  const dateStr = inv.orderDate
-    ? new Date(inv.orderDate).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})
-    : new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
+  const dateStr = new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
   const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet'};
   const payIcon = payIcons[inv.payment] || 'ti-wallet';
 
