@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  * Run: javac -cp .;mssql-jdbc.jar PosServer.java DatabaseManager.java [all other .java files]
  *       java  -cp .;mssql-jdbc.jar com.pos.PosServer
  */
+// build: 1779997628
 public class PosServer {
 
     private static final int PORT = System.getenv("PORT") != null
