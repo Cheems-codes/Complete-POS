@@ -507,7 +507,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Order #</th><th>Date</th><th>Subtotal</th><th>Discount</th><th>Total</th><th>Payment</th><th>Discount Type</th><th></th></tr></thead>
+            <thead><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Subtotal</th><th>Discount</th><th>Total</th><th>Payment</th><th>Discount Type</th><th></th></tr></thead>
             <tbody id="sales-tbody"></tbody>
           </table>
         </div>
@@ -1199,7 +1199,7 @@ async function doRestock(){
 // ════════════ SALES / LOG RENDERERS — pull from DB ════════════
 async function renderSales(){
   const tbody=document.getElementById('sales-tbody');
-  tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+  tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
 
   try {
     const res=await fetch(`${API}/orders`);
@@ -1230,13 +1230,14 @@ async function renderSales(){
     document.getElementById('ss-items').textContent=dbItems;
 
     if(!orders.length){
-      tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">No orders in database</td></tr>';
+      tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">No orders in database</td></tr>';
       return;
     }
     window._salesOrders = orders;
     allSalesRows = orders.map((o,idx)=>`<tr>
       <td class="mono">#${String(o.orderId).padStart(4,'0')}</td>
       <td class="mono" style="font-size:11px">${o.orderDate||'—'}</td>
+      <td style="font-size:12px">${o.customerName||'<span style="color:var(--muted)">Guest</span>'}</td>
       <td class="mono">₱${(+o.subtotal).toFixed(2)}</td>
       <td class="mono" style="color:var(--accent2)">-₱${(+o.discountAmount).toFixed(2)}</td>
       <td class="mono" style="font-weight:600">₱${(+o.total).toFixed(2)}</td>
@@ -1254,7 +1255,7 @@ async function renderSales(){
     document.getElementById('ss-avg').textContent='₱'+(sessionOrders?totalRevenue/sessionOrders:0).toFixed(2);
     document.getElementById('ss-disc').textContent='₱'+totalDiscounts.toFixed(2);
     document.getElementById('ss-items').textContent=totalItems;
-    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+    tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
   }
 }
 
@@ -1275,7 +1276,7 @@ async function renderRestockLog(){
       <td>${r.restockedBy}</td>
     </tr>`).join('');
   } catch(e){
-    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+    tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
   }
 }
 
@@ -1530,7 +1531,7 @@ async function viewOrderItems(orderId, orderData){
       cashTendered: o.cashTendered    || null,
       change:       o.changeAmount    || null,
       orderDate:    o.orderDate       || null,
-      customerName: currentCustomer   ? currentCustomer.name : 'Guest',
+      customerName: o.customerName || (currentCustomer ? currentCustomer.name : 'Guest'),
       items: items.map(i=>({ name:i.productName, icon:'📦', qty:+i.quantity, unitPrice:+i.unitPrice }))
     };
     showInvoice(order);

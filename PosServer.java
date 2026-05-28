@@ -116,9 +116,11 @@ public class PosServer {
         @Override public void handle(HttpExchange ex) throws IOException {
             if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
             StringBuilder sb = new StringBuilder("[");
-            String sql = "SELECT order_id, order_date, subtotal, discount_type, discount_amount, " +
-                         "total, payment_method, cash_tendered, change_amount " +
-                         "FROM orders ORDER BY order_date DESC";
+            String sql = "SELECT o.order_id, o.order_date, o.subtotal, o.discount_type, o.discount_amount, " +
+                         "o.total, o.payment_method, o.cash_tendered, o.change_amount, o.account_info, " +
+                         "c.name AS customer_name " +
+                         "FROM orders o LEFT JOIN customers c ON o.customer_id = c.customer_id " +
+                         "ORDER BY o.order_date DESC";
             try (Connection c = DatabaseManager.getConnection();
                  Statement st = c.createStatement();
                  ResultSet rs = st.executeQuery(sql)) {
@@ -128,13 +130,16 @@ public class PosServer {
                     sb.append(String.format(
                         "{\"orderId\":%d,\"orderDate\":%s,\"subtotal\":%.2f," +
                         "\"discountType\":%s,\"discountAmount\":%.2f,\"total\":%.2f," +
-                        "\"paymentMethod\":%s,\"cashTendered\":%s,\"changeAmount\":%s}",
+                        "\"paymentMethod\":%s,\"cashTendered\":%s,\"changeAmount\":%s," +
+                        "\"accountInfo\":%s,\"customerName\":%s}",
                         rs.getInt("order_id"), q(rs.getString("order_date")),
                         rs.getDouble("subtotal"), q(rs.getString("discount_type")),
                         rs.getDouble("discount_amount"), rs.getDouble("total"),
                         q(rs.getString("payment_method")),
                         rs.getObject("cash_tendered") == null ? "null" : rs.getDouble("cash_tendered")+"",
-                        rs.getObject("change_amount")  == null ? "null" : rs.getDouble("change_amount")+""));
+                        rs.getObject("change_amount")  == null ? "null" : rs.getDouble("change_amount")+"",
+                        q(rs.getString("account_info")),
+                        q(rs.getString("customer_name"))));
                     first = false;
                 }
             } catch (SQLException e) {
