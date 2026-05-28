@@ -1809,7 +1809,8 @@ function printInvoice(){
     .r-barcode span{display:inline-block;width:2.5px;background:#0D1B3E;border-radius:1px;opacity:.7}
     .r-order-num{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#7A96C2;letter-spacing:2px}
     @media print{body{background:#fff;padding:0}.receipt{box-shadow:none;border-radius:0;max-width:100%}}
-  </style></head><body>${html}</body></html>`);
+  </style></head><body>${html}</body><!-- build:1779995104 -->
+</html>`);
   w.document.close();
   setTimeout(()=>{w.focus();w.print();},600);
 }
@@ -1841,4 +1842,5 @@ function showToast(msg){
 init();
 </script>
 </body>
+<!-- build:1779995104 -->
 </html>
