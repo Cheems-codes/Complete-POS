@@ -33,6 +33,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--dark);displa
 .nav-item.active{background:rgba(46,124,246,.22);color:#5BA4FF;font-weight:500}
 .staff-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
 .nav-sub{padding-left:22px;font-size:12.5px}
+.receipt-btn{background:rgba(46,124,246,.12);border:1px solid rgba(46,124,246,.25);color:var(--accent2);border-radius:7px;padding:4px 8px;cursor:pointer;font-size:13px;transition:.15s}
+.receipt-btn:hover{background:rgba(46,124,246,.25);color:#5BA4FF}
 .nav-login-wrap{padding:10px 10px 6px;border-top:1px solid rgba(255,255,255,.07)}
 .nav-login-wrap .nav-item{color:rgba(91,164,255,.85);border:1px solid rgba(91,164,255,.2);border-radius:9px;justify-content:center;gap:8px;font-size:13px}
 .nav-login-wrap .nav-item:hover{background:rgba(46,124,246,.2);color:#5BA4FF;border-color:rgba(91,164,255,.4)}
@@ -505,7 +507,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Order #</th><th>Items</th><th>Subtotal</th><th>Discount</th><th>Total</th><th>Payment</th><th>Discount Type</th></tr></thead>
+            <thead><tr><th>Order #</th><th>Date</th><th>Subtotal</th><th>Discount</th><th>Total</th><th>Payment</th><th>Discount Type</th><th></th></tr></thead>
             <tbody id="sales-tbody"></tbody>
           </table>
         </div>
@@ -793,6 +795,12 @@ function closeCart(){
 }
 
 // ════════════ NAVIGATION ════════════
+function viewSalesReceipt(idx){
+  const o = window._salesOrders[idx];
+  if(!o) return;
+  viewOrderItems(o.orderId, o);
+}
+
 function toggleStaffMenu(){
   const menu = document.getElementById('staff-submenu');
   const chevron = document.getElementById('staff-chevron');
@@ -1191,7 +1199,7 @@ async function doRestock(){
 // ════════════ SALES / LOG RENDERERS — pull from DB ════════════
 async function renderSales(){
   const tbody=document.getElementById('sales-tbody');
-  tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+  tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
 
   try {
     const res=await fetch(`${API}/orders`);
@@ -1222,10 +1230,11 @@ async function renderSales(){
     document.getElementById('ss-items').textContent=dbItems;
 
     if(!orders.length){
-      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No orders in database</td></tr>';
+      tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">No orders in database</td></tr>';
       return;
     }
-    allSalesRows = orders.map(o=>`<tr>
+    window._salesOrders = orders;
+    allSalesRows = orders.map((o,idx)=>`<tr>
       <td class="mono">#${String(o.orderId).padStart(4,'0')}</td>
       <td class="mono" style="font-size:11px">${o.orderDate||'—'}</td>
       <td class="mono">₱${(+o.subtotal).toFixed(2)}</td>
@@ -1233,6 +1242,7 @@ async function renderSales(){
       <td class="mono" style="font-weight:600">₱${(+o.total).toFixed(2)}</td>
       <td>${o.paymentMethod||'—'}</td>
       <td><span class="cat-tag" style="background:${o.discountType?'#EFF4FB':'var(--bg)'};color:${o.discountType?'var(--accent)':'var(--muted)'}">${o.discountType||'None'}</span></td>
+      <td><button class="receipt-btn" data-idx="${idx}" onclick="viewSalesReceipt(${idx})"><i class="ti ti-receipt"></i></button></td>
     </tr>`);
     // Apply any active search filter
     const sq = (document.getElementById('sales-search')||{}).value||'';
@@ -1244,7 +1254,7 @@ async function renderSales(){
     document.getElementById('ss-avg').textContent='₱'+(sessionOrders?totalRevenue/sessionOrders:0).toFixed(2);
     document.getElementById('ss-disc').textContent='₱'+totalDiscounts.toFixed(2);
     document.getElementById('ss-items').textContent=totalItems;
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
   }
 }
 
@@ -1265,7 +1275,7 @@ async function renderRestockLog(){
       <td>${r.restockedBy}</td>
     </tr>`).join('');
   } catch(e){
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--danger)">⚠ Cannot reach backend server</td></tr>';
   }
 }
 
