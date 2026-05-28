@@ -1039,9 +1039,11 @@ async function checkout(){
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error||'Checkout failed');
-    savedOrderId = data.orderId || orderCount;
+    if(!data.orderId) throw new Error('No orderId returned');
+    savedOrderId = data.orderId;
   } catch(e){
-    console.warn('[API] Checkout error (continuing locally):', e.message);
+    showToast('⚠ DB save failed: ' + e.message);
+    console.error('[API] Checkout error:', e.message);
   }
 
   // Build invoice string (mirrors getInvoiceString() from Java)
@@ -1519,7 +1521,7 @@ async function viewOrderItems(orderId, orderData){
       change:       o.changeAmount    || null,
       orderDate:    o.orderDate       || null,
       customerName: currentCustomer   ? currentCustomer.name : 'Guest',
-      items: items.map(i=>({ name:i.productName, icon:'📦', qty:i.quantity, unitPrice:i.unitPrice }))
+      items: items.map(i=>({ name:i.productName, icon:'📦', qty:+i.quantity, unitPrice:+i.unitPrice }))
     };
     showInvoice(order);
   } catch(e){ showToast('⚠ Could not load order details'); }
