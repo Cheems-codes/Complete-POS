@@ -569,15 +569,17 @@ tbody td{padding:10px 14px;color:var(--dark)}
 
     <!-- EMPLOYEES VIEW -->
     <div class="view" id="view-employees">
-      <div class="view-head">
-        <div>
-          <div class="view-h">Employee Profiles</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Manage staff accounts — employees can log in from any device</div>
+      <div class="view-body">
+        <div class="view-head">
+          <div>
+            <div class="view-h">Employee Profiles</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Manage staff accounts — employees can log in from any device</div>
+          </div>
+          <button class="btn-primary" onclick="openAddEmployeeModal()"><i class="ti ti-user-plus"></i> Add Employee</button>
         </div>
-        <button class="btn-primary" onclick="openAddEmployeeModal()"><i class="ti ti-user-plus"></i> Add Employee</button>
+        <div id="employees-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;max-width:900px"></div>
+        <div id="employees-tbody" style="display:none"></div>
       </div>
-      <div id="employees-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:4px 0"></div>
-      <div id="employees-tbody" style="display:none"></div>
     </div>
 
   </div><!-- /content-area -->
@@ -657,7 +659,10 @@ tbody td{padding:10px 14px;color:var(--dark)}
     </div>
     <div class="form-row">
       <label>Password</label>
-      <input type="password" id="emp-pass" placeholder="Create a password">
+      <div style="position:relative">
+        <input type="password" id="emp-pass" placeholder="Create a password" style="width:100%;padding-right:40px;box-sizing:border-box">
+        <button type="button" onclick="togglePw('emp-pass',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:0;font-size:16px"><i class="ti ti-eye"></i></button>
+      </div>
     </div>
     <div class="login-err" id="emp-err" style="display:none">Name and password are required.</div>
     <div class="modal-btns">
@@ -691,7 +696,10 @@ tbody td{padding:10px 14px;color:var(--dark)}
     </div>
     <div class="form-row">
       <label>Password</label>
-      <input type="password" id="login-pw" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doLogin()">
+      <div style="position:relative">
+        <input type="password" id="login-pw" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doLogin()" style="width:100%;padding-right:40px;box-sizing:border-box">
+        <button type="button" onclick="togglePw('login-pw',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:0;font-size:16px"><i class="ti ti-eye"></i></button>
+      </div>
     </div>
     <div class="login-err" id="login-err">✘ Access Denied: Incorrect credentials.</div>
     <div class="modal-btns">
@@ -929,6 +937,18 @@ async function saveEmployee(){
 }
 function closeEmpModal(){
   document.getElementById('emp-modal').classList.remove('open');
+}
+
+function togglePw(inputId, btn){
+  const inp = document.getElementById(inputId);
+  const icon = btn.querySelector('i');
+  if(inp.type==='password'){
+    inp.type='text';
+    icon.className='ti ti-eye-off';
+  } else {
+    inp.type='password';
+    icon.className='ti ti-eye';
+  }
 }
 
 function toggleStaffMenu(){
