@@ -862,7 +862,7 @@ async function renderEmployees(){
   }
   tbody.innerHTML=emps.map(e=>`<tr>
     <td>${e.name}</td>
-    <td style="color:var(--muted);font-size:12px">${e.name.toLowerCase().replace(/\s+/g,'.')}</td>
+    <td style="color:var(--muted);font-size:12px">${(e.name||'').toLowerCase().replace(/\s+/g,'.')}</td>
     <td><span style="font-family:monospace;background:var(--bg);padding:2px 8px;border-radius:5px;font-size:12px">${'•'.repeat(e.password.length)}</span></td>
     <td style="display:flex;gap:6px">
       <button class="receipt-btn" onclick="editEmployee(${e.id})"><i class="ti ti-pencil"></i></button>
@@ -1442,21 +1442,22 @@ async function renderAuditTrail(){
 }
 
 // ════════════ AUTH ════════════
-async function openLoginModal(){
+function openLoginModal(){
   document.getElementById('login-modal').classList.add('open');
   document.getElementById('login-pw').value='';
   document.getElementById('login-err').style.display='none';
-  // Populate employee dropdown from DB
   const sel=document.getElementById('login-user-select');
   sel.innerHTML='<option value="manager">Manager (Admin)</option>';
-  try {
-    const emps = await loadStaff();
-    emps.forEach(e => {
-      const opt=document.createElement('option');
-      opt.value='emp_'+e.id; opt.textContent=e.name;
-      sel.appendChild(opt);
-    });
-  } catch(e){}
+  // Populate employee dropdown from DB
+  fetch(`${API}/staff`)
+    .then(r=>r.json())
+    .then(emps=>{
+      emps.forEach(e=>{
+        const opt=document.createElement('option');
+        opt.value='emp_'+e.id; opt.textContent=e.name;
+        sel.appendChild(opt);
+      });
+    }).catch(()=>{});
   setTimeout(()=>document.getElementById('login-pw').focus(),100);
 }
 function closeLoginModal(){
@@ -1826,7 +1827,7 @@ function filterSalesTable(q){
   const filtered = allSalesRows.filter(row => row.toLowerCase().includes(sq));
   tbody.innerHTML = filtered.length
     ? filtered.join('')
-    : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No matching transactions</td></tr>';
+    : '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">No matching transactions</td></tr>';
 }
 
 // ════════════ TOAST ════════════
