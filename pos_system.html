@@ -1472,28 +1472,37 @@ async function renderMyOrders(){
 
 async function viewOrderItems(orderId){
   try {
-    const res = await fetch(`${API}/order-items?orderId=${orderId}`);
-    const items = await res.json();
-    // Show invoice for historical order
-    const order = { orderId, sub:0, disc:0, total:0, discType:'—', payment:'—', accountInfo:null, cashTendered:null,
-      customerName: currentCustomer?currentCustomer.name:'Guest',
-      items: items.map(i=>({name:i.productName,icon:'📦',qty:i.quantity,unitPrice:i.unitPrice}))
+    const [itemsRes, ordersRes] = await Promise.all([
+      fetch(`${API}/order-items?orderId=${orderId}`),
+      fetch(`${API}/orders`)
+    ]);
+    const items = await itemsRes.json();
+    const allOrders = await ordersRes.json();
+    const o = allOrders.find(x => x.orderId == orderId) || {};
+
+    const order = {
+      orderId,
+      sub:          o.subtotal       != null ? o.subtotal       : items.reduce((s,i)=> s + i.unitPrice*i.quantity, 0),
+      disc:         o.discountAmount != null ? o.discountAmount : 0,
+      total:        o.total          != null ? o.total          : items.reduce((s,i)=> s + i.subtotal, 0),
+      discType:     o.discountType   || '—',
+      payment:      o.paymentMethod  || '—',
+      accountInfo:  o.accountInfo    || null,
+      cashTendered: o.cashTendered   || null,
+      orderDate:    o.orderDate      || null,
+      customerName: currentCustomer  ? currentCustomer.name : 'Guest',
+      items: items.map(i=>({ name:i.productName, icon:'📦', qty:i.quantity, unitPrice:i.unitPrice }))
     };
-    items.forEach(i=>{ order.sub += i.unitPrice*i.quantity; order.total += i.subtotal; });
     showInvoice(order);
   } catch(e){ showToast('⚠ Could not load order details'); }
 }
 
 // ════════════ INVOICE MODAL ════════════
-function showInvoice(inv){
-  document.getElementById('invoice-modal').classList.add('open');
-  window._lastInvoice = inv;
-  document.getElementById('receipt-render').innerHTML = buildReceiptHTML(inv);
-}
-
 function buildReceiptHTML(inv){
   const orderNum = String(inv.orderId).padStart(4,'0');
-  const dateStr = new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
+  const dateStr = inv.orderDate
+    ? new Date(inv.orderDate).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})
+    : new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
   const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet'};
   const payIcon = payIcons[inv.payment] || 'ti-wallet';
 
