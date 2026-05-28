@@ -1476,8 +1476,9 @@ async function renderMyOrders(){
       container.innerHTML = '<div class="my-orders-empty"><i class="ti ti-receipt-off"></i><p>No orders yet</p><span>Your completed orders will appear here after checkout</span></div>';
       return;
     }
-    container.innerHTML = orders.map(o=>`
-      <div class="order-card" onclick="viewOrderItems(${o.orderId}, ${JSON.stringify(o).replace(/'/g, '&apos;')})">
+    window._myOrders = orders;
+    container.innerHTML = orders.map((o,idx)=>`
+      <div class="order-card" onclick="viewOrderItems(${o.orderId}, window._myOrders[${idx}])">
         <div class="order-card-head">
           <span class="order-card-num">#${String(o.orderId).padStart(4,'0')}</span>
           <span class="order-card-date">${o.orderDate||'—'}</span>
