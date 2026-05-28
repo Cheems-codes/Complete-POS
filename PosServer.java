@@ -542,7 +542,7 @@ public class PosServer {
                     boolean first = true;
                     while (rs.next()) {
                         if (!first) sb.append(",");
-                        sb.append(String.format("{"id":%d,"name":%s,"password":%s}",
+                        sb.append(String.format("{\"id\":%d,\"name\":%s,\"password\":%s}",
                             rs.getInt("id"), q(rs.getString("name")), q(rs.getString("password_hash"))));
                         first = false;
                     }
