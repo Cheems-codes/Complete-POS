@@ -1478,7 +1478,7 @@ async function renderMyOrders(){
     }
     window._myOrders = orders;
     container.innerHTML = orders.map((o,idx)=>`
-      <div class="order-card" onclick="viewOrderItems(${o.orderId}, window._myOrders[${idx}])">
+      <div class="order-card" data-idx="${idx}" data-orderid="${o.orderId}">
         <div class="order-card-head">
           <span class="order-card-num">#${String(o.orderId).padStart(4,'0')}</span>
           <span class="order-card-date">${o.orderDate||'—'}</span>
@@ -1490,6 +1490,13 @@ async function renderMyOrders(){
           <span class="order-pill" style="color:var(--success);border-color:var(--success)">✓ Completed</span>
         </div>
       </div>`).join('');
+    container.querySelectorAll('.order-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const idx = parseInt(card.dataset.idx);
+        const orderId = parseInt(card.dataset.orderid);
+        viewOrderItems(orderId, window._myOrders[idx]);
+      });
+    });
   } catch(e){
     container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger)">⚠ Cannot load orders</div>';
   }
