@@ -567,6 +567,18 @@ tbody td{padding:10px 14px;color:var(--dark)}
       </div>
     </div>
 
+    <!-- EMPLOYEES VIEW -->
+    <div class="view" id="view-employees">
+      <div class="view-head">
+        <div class="view-h">Employee Profiles</div>
+        <button class="btn-primary" onclick="openAddEmployeeModal()"><i class="ti ti-user-plus"></i> Add Employee</button>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Password</th><th>Actions</th></tr></thead>
+        <tbody id="employees-tbody"></tbody>
+      </table>
+    </div>
+
   </div><!-- /content-area -->
 </div><!-- /main -->
 </div><!-- /app -->
@@ -627,17 +639,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
   </div>
 </div>
 
-<!-- EMPLOYEES VIEW -->
-<div class="view" id="view-employees">
-  <div class="view-head">
-    <div class="view-h">Employee Profiles</div>
-    <button class="btn-primary" onclick="openAddEmployeeModal()"><i class="ti ti-user-plus"></i> Add Employee</button>
-  </div>
-  <table class="data-table">
-    <thead><tr><th>Name</th><th>Email</th><th>Password</th><th>Actions</th></tr></thead>
-    <tbody id="employees-tbody"></tbody>
-  </table>
-</div>
+
 
 <!-- ADD EMPLOYEE MODAL -->
 <div class="modal-bg" id="emp-modal">
