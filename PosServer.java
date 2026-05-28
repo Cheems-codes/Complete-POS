@@ -491,7 +491,8 @@ public class PosServer {
             }
             if (customerId < 0) { sendJson(ex, 400, "{\"error\":\"Missing customerId\"}"); return; }
             StringBuilder sb = new StringBuilder("[");
-            String sql = "SELECT o.order_id, o.order_date, o.subtotal, o.discount_type, o.discount_amount, o.total, o.payment_method " +
+            String sql = "SELECT o.order_id, o.order_date, o.subtotal, o.discount_type, o.discount_amount, o.total, " +
+                         "o.payment_method, o.account_info, o.cash_tendered, o.change_amount " +
                          "FROM orders o WHERE o.customer_id = ? ORDER BY o.order_date DESC";
             try (Connection c = DatabaseManager.getConnection();
                  PreparedStatement ps = c.prepareStatement(sql)) {
@@ -507,7 +508,10 @@ public class PosServer {
                       .append("\"discountType\":").append(q(rs.getString("discount_type"))).append(",")
                       .append("\"discountAmount\":").append(rs.getDouble("discount_amount")).append(",")
                       .append("\"total\":").append(rs.getDouble("total")).append(",")
-                      .append("\"paymentMethod\":").append(q(rs.getString("payment_method")))
+                      .append("\"paymentMethod\":").append(q(rs.getString("payment_method"))).append(",")
+                      .append("\"accountInfo\":").append(q(rs.getString("account_info"))).append(",")
+                      .append("\"cashTendered\":").append(rs.getObject("cash_tendered")==null?"null":rs.getDouble("cash_tendered")+"").append(",")
+                      .append("\"changeAmount\":").append(rs.getObject("change_amount")==null?"null":rs.getDouble("change_amount")+"")
                       .append("}");
                     first = false;
                 }

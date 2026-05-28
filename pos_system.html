@@ -1508,6 +1508,7 @@ async function viewOrderItems(orderId, orderData){
       payment:      o.paymentMethod   || '—',
       accountInfo:  o.accountInfo     || null,
       cashTendered: o.cashTendered    || null,
+      change:       o.changeAmount    || null,
       orderDate:    o.orderDate       || null,
       customerName: currentCustomer   ? currentCustomer.name : 'Guest',
       items: items.map(i=>({ name:i.productName, icon:'📦', qty:i.quantity, unitPrice:i.unitPrice }))
@@ -1550,7 +1551,7 @@ function buildReceiptHTML(inv){
 
   const cashRows = inv.payment==='Cash' && inv.cashTendered
     ? `<div class="r-tot-row" style="color:var(--mid)"><span>Cash Tendered</span><span>₱${(+inv.cashTendered).toFixed(2)}</span></div>
-       <div class="r-tot-row" style="color:var(--success);font-weight:600"><span>Change</span><span>₱${((+inv.cashTendered)-(+inv.total)).toFixed(2)}</span></div>` : '';
+       <div class="r-tot-row" style="color:var(--success);font-weight:600"><span>Change</span><span>₱${(inv.change!=null?(+inv.change):((+inv.cashTendered)-(+inv.total))).toFixed(2)}</span></div>` : '';
 
   const acctInfo = inv.accountInfo
     ? `<div class="pay-details"><div class="pay-method">${inv.payment}</div><div class="pay-info">${inv.accountInfo}</div></div>`
