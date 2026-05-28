@@ -1477,7 +1477,7 @@ async function renderMyOrders(){
       return;
     }
     container.innerHTML = orders.map(o=>`
-      <div class="order-card" onclick="viewOrderItems(${o.orderId})">
+      <div class="order-card" onclick="viewOrderItems(${o.orderId}, ${JSON.stringify(o).replace(/'/g, '&apos;')})">
         <div class="order-card-head">
           <span class="order-card-num">#${String(o.orderId).padStart(4,'0')}</span>
           <span class="order-card-date">${o.orderDate||'—'}</span>
@@ -1494,22 +1494,16 @@ async function renderMyOrders(){
   }
 }
 
-async function viewOrderItems(orderId){
+async function viewOrderItems(orderId, orderData){
   try {
-    // Fetch items and full order data in parallel
-    const [itemsRes, ordersRes] = await Promise.all([
-      fetch(`${API}/order-items?orderId=${orderId}`),
-      fetch(`${API}/orders`)
-    ]);
-    const items = await itemsRes.json();
-    const allOrders = await ordersRes.json();
-    const o = allOrders.find(x => x.orderId == orderId) || {};
-
+    const o = orderData || {};
+    const res = await fetch(`${API}/order-items?orderId=${orderId}`);
+    const items = await res.json();
     const order = {
       orderId,
-      sub:          o.subtotal        != null ? o.subtotal        : items.reduce((s,i)=> s + i.unitPrice*i.quantity, 0),
-      disc:         o.discountAmount  != null ? o.discountAmount  : 0,
-      total:        o.total           != null ? o.total           : items.reduce((s,i)=> s + i.subtotal, 0),
+      sub:          o.subtotal        != null ? +o.subtotal        : items.reduce((s,i)=> s + i.unitPrice*i.quantity, 0),
+      disc:         o.discountAmount  != null ? +o.discountAmount  : 0,
+      total:        o.total           != null ? +o.total           : items.reduce((s,i)=> s + i.subtotal, 0),
       discType:     o.discountType    || '—',
       payment:      o.paymentMethod   || '—',
       accountInfo:  o.accountInfo     || null,
