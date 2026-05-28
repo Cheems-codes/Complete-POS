@@ -628,13 +628,13 @@ tbody td{padding:10px 14px;color:var(--dark)}
 </div>
 
 <!-- EMPLOYEES VIEW -->
-<div class="view" id="view-employees" style="display:none">
+<div class="view" id="view-employees">
   <div class="view-head">
     <div class="view-h">Employee Profiles</div>
     <button class="btn-primary" onclick="openAddEmployeeModal()"><i class="ti ti-user-plus"></i> Add Employee</button>
   </div>
   <table class="data-table">
-    <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Name</th><th>Email</th><th>Password</th><th>Actions</th></tr></thead>
     <tbody id="employees-tbody"></tbody>
   </table>
 </div>
@@ -647,6 +647,10 @@ tbody td{padding:10px 14px;color:var(--dark)}
     <div class="form-row">
       <label>Full Name</label>
       <input type="text" id="emp-name" placeholder="e.g. Juan Dela Cruz">
+    </div>
+    <div class="form-row">
+      <label>Email</label>
+      <input type="email" id="emp-email" placeholder="e.g. juan@email.com">
     </div>
     <div class="form-row">
       <label>Password</label>
@@ -677,18 +681,16 @@ tbody td{padding:10px 14px;color:var(--dark)}
 <div class="modal-bg" id="login-modal">
   <div class="login-modal">
     <h3>Staff Authentication</h3>
-    <p class="sub">Select your profile and enter your password</p>
+    <p class="sub">Enter your credentials to access staff features</p>
     <div class="form-row">
-      <label>Who are you?</label>
-      <select id="login-user-select" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
-        <option value="manager">Manager (Admin)</option>
-      </select>
+      <label>Email or Name</label>
+      <input type="text" id="login-identifier" placeholder="Email or your name…" onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
     </div>
     <div class="form-row">
       <label>Password</label>
       <input type="password" id="login-pw" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <div class="login-err" id="login-err">✘ Access Denied: Incorrect Password.</div>
+    <div class="login-err" id="login-err">✘ Access Denied: Incorrect credentials.</div>
     <div class="modal-btns">
       <button class="btn-primary" onclick="doLogin()"><i class="ti ti-lock-open"></i> Login</button>
       <button class="btn-outline" onclick="closeLoginModal()">Cancel</button>
@@ -862,7 +864,7 @@ async function renderEmployees(){
   }
   tbody.innerHTML=emps.map(e=>`<tr>
     <td>${e.name}</td>
-    <td style="color:var(--muted);font-size:12px">${(e.name||'').toLowerCase().replace(/\s+/g,'.')}</td>
+    <td style="color:var(--muted);font-size:12px">${e.email||'—'}</td>
     <td><span style="font-family:monospace;background:var(--bg);padding:2px 8px;border-radius:5px;font-size:12px">${'•'.repeat(e.password.length)}</span></td>
     <td style="display:flex;gap:6px">
       <button class="receipt-btn" onclick="editEmployee(${e.id})"><i class="ti ti-pencil"></i></button>
@@ -876,6 +878,7 @@ function openAddEmployeeModal(){
   editEmpId=null;
   document.getElementById('emp-modal-title').textContent='Add Employee';
   document.getElementById('emp-name').value='';
+  document.getElementById('emp-email').value='';
   document.getElementById('emp-pass').value='';
   document.getElementById('emp-err').style.display='none';
   document.getElementById('emp-modal').classList.add('open');
@@ -886,6 +889,7 @@ function editEmployee(id){
   editEmpId=id;
   document.getElementById('emp-modal-title').textContent='Edit Employee';
   document.getElementById('emp-name').value=emp.name;
+  document.getElementById('emp-email').value=emp.email||'';
   document.getElementById('emp-pass').value=emp.password;
   document.getElementById('emp-err').style.display='none';
   document.getElementById('emp-modal').classList.add('open');
@@ -900,9 +904,10 @@ async function deleteEmployee(id, name){
 }
 async function saveEmployee(){
   const name=document.getElementById('emp-name').value.trim();
+  const email=document.getElementById('emp-email').value.trim();
   const pass=document.getElementById('emp-pass').value.trim();
   if(!name||!pass){ document.getElementById('emp-err').style.display='block'; return; }
-  const payload = editEmpId!=null ? {id:editEmpId, name, password:pass} : {name, password:pass};
+  const payload = editEmpId!=null ? {id:editEmpId, name, email, password:pass} : {name, email, password:pass};
   try {
     await fetch(`${API}/staff`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
     showToast(`✓ ${name} ${editEmpId!=null?'updated':'added'}`);
@@ -1444,21 +1449,10 @@ async function renderAuditTrail(){
 // ════════════ AUTH ════════════
 function openLoginModal(){
   document.getElementById('login-modal').classList.add('open');
+  document.getElementById('login-identifier').value='';
   document.getElementById('login-pw').value='';
   document.getElementById('login-err').style.display='none';
-  const sel=document.getElementById('login-user-select');
-  sel.innerHTML='<option value="manager">Manager (Admin)</option>';
-  // Populate employee dropdown from DB
-  fetch(`${API}/staff`)
-    .then(r=>r.json())
-    .then(emps=>{
-      emps.forEach(e=>{
-        const opt=document.createElement('option');
-        opt.value='emp_'+e.id; opt.textContent=e.name;
-        sel.appendChild(opt);
-      });
-    }).catch(()=>{});
-  setTimeout(()=>document.getElementById('login-pw').focus(),100);
+  setTimeout(()=>document.getElementById('login-identifier').focus(),100);
 }
 function closeLoginModal(){
   document.getElementById('login-modal').classList.remove('open');
@@ -1466,14 +1460,22 @@ function closeLoginModal(){
 }
 async function doLogin(){
   const pw=document.getElementById('login-pw').value;
-  const sel=document.getElementById('login-user-select').value;
+  const identifier=document.getElementById('login-identifier').value.trim().toLowerCase();
   let user=null;
-  if(sel==='manager' && pw===PASSWORDS.admin){
+  // Check manager
+  if((identifier==='admin'||identifier==='manager'||identifier==='admin@pos.com') && pw===PASSWORDS.admin){
     user={name:'Admin',role:'Manager'};
-  } else if(sel.startsWith('emp_')){
-    const empId=parseInt(sel.replace('emp_',''));
-    const emp=_staffCache.find(e=>e.id==empId);
-    if(emp && pw===emp.password) user={name:emp.name,role:'Employee'};
+  } else {
+    // Check employees from DB
+    try {
+      const emps = await loadStaff();
+      const emp = emps.find(e=>
+        e.name.toLowerCase()===identifier ||
+        (e.email&&e.email.toLowerCase()===identifier) ||
+        e.name.toLowerCase().replace(/\s+/g,'')===identifier
+      );
+      if(emp && pw===emp.password) user={name:emp.name,role:'Employee'};
+    } catch(e){}
   }
   if(user){
     currentUser=user;

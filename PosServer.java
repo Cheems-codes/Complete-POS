@@ -535,15 +535,15 @@ public class PosServer {
 
             if ("GET".equals(method)) {
                 StringBuilder sb = new StringBuilder("[");
-                String sql = "SELECT id, name, password_hash FROM staff ORDER BY name";
+                String sql = "SELECT id, name, email, password_hash FROM staff ORDER BY name";
                 try (Connection c = DatabaseManager.getConnection();
                      Statement st = c.createStatement();
                      ResultSet rs = st.executeQuery(sql)) {
                     boolean first = true;
                     while (rs.next()) {
                         if (!first) sb.append(",");
-                        sb.append(String.format("{\"id\":%d,\"name\":%s,\"password\":%s}",
-                            rs.getInt("id"), q(rs.getString("name")), q(rs.getString("password_hash"))));
+                        sb.append(String.format("{\"id\":%d,\"name\":%s,\"email\":%s,\"password\":%s}",
+                            rs.getInt("id"), q(rs.getString("name")), q(rs.getString("email")), q(rs.getString("password_hash"))));
                         first = false;
                     }
                 } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); return; }
@@ -558,12 +558,14 @@ public class PosServer {
                 if (name == null || pass == null) { sendJson(ex, 400, "{\"error\":\"name and password required\"}"); return; }
                 try (Connection c = DatabaseManager.getConnection()) {
                     if (idStr != null) {
-                        PreparedStatement ps = c.prepareStatement("UPDATE staff SET name=?, password_hash=? WHERE id=?");
-                        ps.setString(1, name); ps.setString(2, pass); ps.setInt(3, Integer.parseInt(idStr));
+                        String email = jsonVal(body, "email");
+                        PreparedStatement ps = c.prepareStatement("UPDATE staff SET name=?, email=?, password_hash=? WHERE id=?");
+                        ps.setString(1, name); ps.setString(2, email); ps.setString(3, pass); ps.setInt(4, Integer.parseInt(idStr));
                         ps.executeUpdate();
                     } else {
-                        PreparedStatement ps = c.prepareStatement("INSERT INTO staff (name, password_hash) VALUES (?,?)");
-                        ps.setString(1, name); ps.setString(2, pass);
+                        String email = jsonVal(body, "email");
+                        PreparedStatement ps = c.prepareStatement("INSERT INTO staff (name, email, password_hash) VALUES (?,?,?)");
+                        ps.setString(1, name); ps.setString(2, email); ps.setString(3, pass);
                         ps.executeUpdate();
                     }
                 } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); return; }
