@@ -46,6 +46,7 @@ public class PosServer {
         server.createContext("/api/customer/register", new CustomerRegisterHandler());
         server.createContext("/api/customer/login",    new CustomerLoginHandler());
         server.createContext("/api/customer/orders",   new CustomerOrdersHandler());
+        server.createContext("/api/staff",             new StaffHandler());
         server.createContext("/",                  new StaticHandler());   // serves pos_system.html
 
         server.setExecutor(null);
@@ -523,6 +524,68 @@ public class PosServer {
             } catch (SQLException e) { sendJson(ex, 500, escape(e.getMessage())); return; }
             sb.append("]");
             sendJson(ex, 200, sb.toString());
+        }
+    }
+
+    // ── GET/POST/DELETE /api/staff ───────────────────────────────────────────
+    static class StaffHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            String method = ex.getRequestMethod();
+
+            if ("GET".equals(method)) {
+                // Return all employees
+                StringBuilder sb = new StringBuilder("[");
+                String sql = "SELECT id, name, password_hash FROM staff ORDER BY name";
+                try (Connection c = DatabaseManager.getConnection();
+                     Statement st = c.createStatement();
+                     ResultSet rs = st.executeQuery(sql)) {
+                    boolean first = true;
+                    while (rs.next()) {
+                        if (!first) sb.append(",");
+                        sb.append(String.format("{"id":%d,"name":%s,"password":%s}",
+                            rs.getInt("id"), q(rs.getString("name")), q(rs.getString("password_hash"))));
+                        first = false;
+                    }
+                } catch (SQLException e) { sendJson(ex, 500, "{"error":" + escape(e.getMessage()) + "}"); return; }
+                sb.append("]");
+                sendJson(ex, 200, sb.toString());
+
+            } else if ("POST".equals(method)) {
+                // Add or update employee
+                String body = readBody(ex);
+                String name = jsonVal(body, "name");
+                String pass = jsonVal(body, "password");
+                String idStr = jsonVal(body, "id");
+                if (name == null || pass == null) { sendJson(ex, 400, "{"error":"name and password required"}"); return; }
+                try (Connection c = DatabaseManager.getConnection()) {
+                    if (idStr != null) {
+                        // Update
+                        PreparedStatement ps = c.prepareStatement("UPDATE staff SET name=?, password_hash=? WHERE id=?");
+                        ps.setString(1, name); ps.setString(2, pass); ps.setInt(3, Integer.parseInt(idStr));
+                        ps.executeUpdate();
+                    } else {
+                        // Insert
+                        PreparedStatement ps = c.prepareStatement("INSERT INTO staff (name, password_hash) VALUES (?,?)");
+                        ps.setString(1, name); ps.setString(2, pass);
+                        ps.executeUpdate();
+                    }
+                } catch (SQLException e) { sendJson(ex, 500, "{"error":" + escape(e.getMessage()) + "}"); return; }
+                sendJson(ex, 200, "{"ok":true}");
+
+            } else if ("DELETE".equals(method)) {
+                // Delete employee by id in query string
+                String query = ex.getRequestURI().getQuery();
+                if (query == null || !query.startsWith("id=")) { sendJson(ex, 400, "{"error":"Missing id"}"); return; }
+                int id = Integer.parseInt(query.split("=")[1]);
+                try (Connection c = DatabaseManager.getConnection();
+                     PreparedStatement ps = c.prepareStatement("DELETE FROM staff WHERE id=?")) {
+                    ps.setInt(1, id); ps.executeUpdate();
+                } catch (SQLException e) { sendJson(ex, 500, "{"error":" + escape(e.getMessage()) + "}"); return; }
+                sendJson(ex, 200, "{"ok":true}");
+            } else {
+                sendJson(ex, 405, "{"error":"Method not allowed"}");
+            }
         }
     }
 

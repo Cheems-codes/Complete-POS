@@ -392,6 +392,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
       <div class="nav-item nav-sub" id="nav-restock-log" onclick="requireLogin('restock-log',this)"><i class="ti ti-rotate-clockwise-2"></i> Restock Log</div>
       <div class="nav-item nav-sub" id="nav-timelog" onclick="requireLogin('timelog',this)"><i class="ti ti-clock"></i> Time Logs</div>
       <div class="nav-item nav-sub" id="nav-audit" onclick="requireLogin('audit',this)"><i class="ti ti-shield-check"></i> Audit Trail</div>
+      <div class="nav-item nav-sub" id="nav-employees" onclick="requireLogin('employees',this)" style="display:none"><i class="ti ti-users"></i> Employee Profiles</div>
       <div class="nav-item nav-sub" id="nav-logout-btn" style="display:none" onclick="logout()"><i class="ti ti-logout"></i> Logout</div>
     </div>
   </div>
@@ -626,6 +627,39 @@ tbody td{padding:10px 14px;color:var(--dark)}
   </div>
 </div>
 
+<!-- EMPLOYEES VIEW -->
+<div class="view" id="view-employees" style="display:none">
+  <div class="view-head">
+    <div class="view-h">Employee Profiles</div>
+    <button class="btn-primary" onclick="openAddEmployeeModal()"><i class="ti ti-user-plus"></i> Add Employee</button>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>Name</th><th>Username</th><th>Password</th><th>Actions</th></tr></thead>
+    <tbody id="employees-tbody"></tbody>
+  </table>
+</div>
+
+<!-- ADD EMPLOYEE MODAL -->
+<div class="modal-bg" id="emp-modal">
+  <div class="login-modal">
+    <h3 id="emp-modal-title">Add Employee</h3>
+    <p class="sub">Employee can log in with their name and password</p>
+    <div class="form-row">
+      <label>Full Name</label>
+      <input type="text" id="emp-name" placeholder="e.g. Juan Dela Cruz">
+    </div>
+    <div class="form-row">
+      <label>Password</label>
+      <input type="password" id="emp-pass" placeholder="Create a password">
+    </div>
+    <div class="login-err" id="emp-err" style="display:none">Name and password are required.</div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveEmployee()"><i class="ti ti-check"></i> Save</button>
+      <button class="btn-outline" onclick="closeEmpModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- INVOICE MODAL -->
 <div class="modal-bg" id="invoice-modal">
   <div class="invoice-wrap">
@@ -643,7 +677,13 @@ tbody td{padding:10px 14px;color:var(--dark)}
 <div class="modal-bg" id="login-modal">
   <div class="login-modal">
     <h3>Staff Authentication</h3>
-    <p class="sub">Enter your password to access staff features</p>
+    <p class="sub">Select your profile and enter your password</p>
+    <div class="form-row">
+      <label>Who are you?</label>
+      <select id="login-user-select" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
+        <option value="manager">Manager (Admin)</option>
+      </select>
+    </div>
     <div class="form-row">
       <label>Password</label>
       <input type="password" id="login-pw" placeholder="Enter password…" onkeydown="if(event.key==='Enter')doLogin()">
@@ -801,6 +841,79 @@ function viewSalesReceipt(idx){
   viewOrderItems(o.orderId, o);
 }
 
+// ════════════ EMPLOYEE PROFILES ════════════
+let _staffCache = [];
+
+async function loadStaff(){
+  try {
+    const res = await fetch(`${API}/staff`);
+    _staffCache = await res.json();
+  } catch(e){ _staffCache=[]; }
+  return _staffCache;
+}
+
+async function renderEmployees(){
+  const tbody=document.getElementById('employees-tbody');
+  tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+  const emps = await loadStaff();
+  if(!emps.length){
+    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--muted)">No employees added yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML=emps.map(e=>`<tr>
+    <td>${e.name}</td>
+    <td style="color:var(--muted);font-size:12px">${e.name.toLowerCase().replace(/\s+/g,'.')}</td>
+    <td><span style="font-family:monospace;background:var(--bg);padding:2px 8px;border-radius:5px;font-size:12px">${'•'.repeat(e.password.length)}</span></td>
+    <td style="display:flex;gap:6px">
+      <button class="receipt-btn" onclick="editEmployee(${e.id})"><i class="ti ti-pencil"></i></button>
+      <button class="receipt-btn" style="color:var(--danger);border-color:var(--danger)" onclick="deleteEmployee(${e.id},'${e.name.replace(/'/g,"\\'")}')"><i class="ti ti-trash"></i></button>
+    </td>
+  </tr>`).join('');
+}
+
+let editEmpId=null;
+function openAddEmployeeModal(){
+  editEmpId=null;
+  document.getElementById('emp-modal-title').textContent='Add Employee';
+  document.getElementById('emp-name').value='';
+  document.getElementById('emp-pass').value='';
+  document.getElementById('emp-err').style.display='none';
+  document.getElementById('emp-modal').classList.add('open');
+}
+function editEmployee(id){
+  const emp=_staffCache.find(e=>e.id==id);
+  if(!emp) return;
+  editEmpId=id;
+  document.getElementById('emp-modal-title').textContent='Edit Employee';
+  document.getElementById('emp-name').value=emp.name;
+  document.getElementById('emp-pass').value=emp.password;
+  document.getElementById('emp-err').style.display='none';
+  document.getElementById('emp-modal').classList.add('open');
+}
+async function deleteEmployee(id, name){
+  if(!confirm(`Remove ${name}?`)) return;
+  try {
+    await fetch(`${API}/staff?id=${id}`, {method:'DELETE'});
+    showToast(`✓ ${name} removed`);
+    renderEmployees();
+  } catch(e){ showToast('⚠ Could not delete employee'); }
+}
+async function saveEmployee(){
+  const name=document.getElementById('emp-name').value.trim();
+  const pass=document.getElementById('emp-pass').value.trim();
+  if(!name||!pass){ document.getElementById('emp-err').style.display='block'; return; }
+  const payload = editEmpId!=null ? {id:editEmpId, name, password:pass} : {name, password:pass};
+  try {
+    await fetch(`${API}/staff`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    showToast(`✓ ${name} ${editEmpId!=null?'updated':'added'}`);
+    closeEmpModal();
+    renderEmployees();
+  } catch(e){ showToast('⚠ Could not save employee'); }
+}
+function closeEmpModal(){
+  document.getElementById('emp-modal').classList.remove('open');
+}
+
 function toggleStaffMenu(){
   const menu = document.getElementById('staff-submenu');
   const chevron = document.getElementById('staff-chevron');
@@ -817,7 +930,7 @@ function switchView(view, navEl){
   document.getElementById('topbar-title').textContent={
     register:'Register',inventory:'Inventory',sales:'Sales History',
     'restock-log':'Restock Log',timelog:'Time Logs',audit:'Audit Trail',
-    'my-orders':'My Orders'
+    'my-orders':'My Orders','employees':'Employee Profiles'
   }[view]||view;
   const isRegister = view==='register';
   document.getElementById('search-bar').style.display=isRegister?'':'none';
@@ -829,6 +942,7 @@ function switchView(view, navEl){
   if(view==='restock-log') renderRestockLog();
   if(view==='timelog') renderTimeLog();
   if(view==='audit') renderAuditTrail();
+  if(view==='employees') renderEmployees();
   if(view==='my-orders') renderMyOrders();
 }
 
@@ -1328,10 +1442,21 @@ async function renderAuditTrail(){
 }
 
 // ════════════ AUTH ════════════
-function openLoginModal(){
+async function openLoginModal(){
   document.getElementById('login-modal').classList.add('open');
   document.getElementById('login-pw').value='';
   document.getElementById('login-err').style.display='none';
+  // Populate employee dropdown from DB
+  const sel=document.getElementById('login-user-select');
+  sel.innerHTML='<option value="manager">Manager (Admin)</option>';
+  try {
+    const emps = await loadStaff();
+    emps.forEach(e => {
+      const opt=document.createElement('option');
+      opt.value='emp_'+e.id; opt.textContent=e.name;
+      sel.appendChild(opt);
+    });
+  } catch(e){}
   setTimeout(()=>document.getElementById('login-pw').focus(),100);
 }
 function closeLoginModal(){
@@ -1340,9 +1465,15 @@ function closeLoginModal(){
 }
 async function doLogin(){
   const pw=document.getElementById('login-pw').value;
+  const sel=document.getElementById('login-user-select').value;
   let user=null;
-  if(pw===PASSWORDS.admin) user={name:'Admin',role:'Manager'};
-  else if(pw===PASSWORDS.employee) user={name:'Employee',role:'Employee'};
+  if(sel==='manager' && pw===PASSWORDS.admin){
+    user={name:'Admin',role:'Manager'};
+  } else if(sel.startsWith('emp_')){
+    const empId=parseInt(sel.replace('emp_',''));
+    const emp=_staffCache.find(e=>e.id==empId);
+    if(emp && pw===emp.password) user={name:emp.name,role:'Employee'};
+  }
   if(user){
     currentUser=user;
     try {
@@ -1354,6 +1485,7 @@ async function doLogin(){
     document.getElementById('staff-name-display').textContent=user.name;
     document.getElementById('staff-role-display').textContent=user.role+' — Logged in';
     document.getElementById('nav-login-wrap').style.display='none';
+    if(user.role==='Manager') document.getElementById('nav-employees').style.display='flex';
     document.getElementById('nav-logout-btn').style.display='flex';
     document.getElementById('staff-submenu').style.display='block';
     document.getElementById('staff-chevron').style.transform='rotate(180deg)';
@@ -1378,6 +1510,7 @@ async function logout(){
   currentUser=null;
   document.getElementById('staff-footer').style.display='none';
   document.getElementById('nav-login-wrap').style.display='block';
+  document.getElementById('nav-employees').style.display='none';
   document.getElementById('nav-logout-btn').style.display='none';
   document.getElementById('staff-submenu').style.display='none';
   document.getElementById('staff-chevron').style.transform='rotate(0deg)';

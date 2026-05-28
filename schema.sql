@@ -71,6 +71,14 @@ CREATE TABLE IF NOT EXISTS audit_trail (
     details     TEXT
 );
 
+-- Staff (employees managed by manager)
+CREATE TABLE IF NOT EXISTS staff (
+    id            SERIAL PRIMARY KEY,
+    name          VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at    TIMESTAMP DEFAULT NOW()
+);
+
 -- Customers
 CREATE TABLE IF NOT EXISTS customers (
     customer_id   SERIAL PRIMARY KEY,
