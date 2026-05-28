@@ -546,7 +546,7 @@ public class PosServer {
                             rs.getInt("id"), q(rs.getString("name")), q(rs.getString("password_hash"))));
                         first = false;
                     }
-                } catch (SQLException e) { sendJson(ex, 500, "{"error":" + escape(e.getMessage()) + "}"); return; }
+                } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); return; }
                 sb.append("]");
                 sendJson(ex, 200, sb.toString());
 
@@ -555,7 +555,7 @@ public class PosServer {
                 String name = jsonVal(body, "name");
                 String pass = jsonVal(body, "password");
                 String idStr = jsonVal(body, "id");
-                if (name == null || pass == null) { sendJson(ex, 400, "{"error":"name and password required"}"); return; }
+                if (name == null || pass == null) { sendJson(ex, 400, "{\"error\":\"name and password required\"}"); return; }
                 try (Connection c = DatabaseManager.getConnection()) {
                     if (idStr != null) {
                         PreparedStatement ps = c.prepareStatement("UPDATE staff SET name=?, password_hash=? WHERE id=?");
@@ -566,20 +566,20 @@ public class PosServer {
                         ps.setString(1, name); ps.setString(2, pass);
                         ps.executeUpdate();
                     }
-                } catch (SQLException e) { sendJson(ex, 500, "{"error":" + escape(e.getMessage()) + "}"); return; }
-                sendJson(ex, 200, "{"ok":true}");
+                } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); return; }
+                sendJson(ex, 200, "{\"ok\":true}");
 
             } else if ("DELETE".equals(method)) {
                 String query = ex.getRequestURI().getQuery();
-                if (query == null || !query.startsWith("id=")) { sendJson(ex, 400, "{"error":"Missing id"}"); return; }
+                if (query == null || !query.startsWith("id=")) { sendJson(ex, 400, "{\"error\":\"Missing id\"}"); return; }
                 int id = Integer.parseInt(query.split("=")[1]);
                 try (Connection c = DatabaseManager.getConnection();
                      PreparedStatement ps = c.prepareStatement("DELETE FROM staff WHERE id=?")) {
                     ps.setInt(1, id); ps.executeUpdate();
-                } catch (SQLException e) { sendJson(ex, 500, "{"error":" + escape(e.getMessage()) + "}"); return; }
-                sendJson(ex, 200, "{"ok":true}");
+                } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); return; }
+                sendJson(ex, 200, "{\"ok\":true}");
             } else {
-                sendJson(ex, 405, "{"error":"Method not allowed"}");
+                sendJson(ex, 405, "{\"error\":\"Method not allowed\"}");
             }
         }
     }
