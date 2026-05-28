@@ -534,7 +534,6 @@ public class PosServer {
             String method = ex.getRequestMethod();
 
             if ("GET".equals(method)) {
-                // Return all employees
                 StringBuilder sb = new StringBuilder("[");
                 String sql = "SELECT id, name, password_hash FROM staff ORDER BY name";
                 try (Connection c = DatabaseManager.getConnection();
@@ -552,7 +551,6 @@ public class PosServer {
                 sendJson(ex, 200, sb.toString());
 
             } else if ("POST".equals(method)) {
-                // Add or update employee
                 String body = readBody(ex);
                 String name = jsonVal(body, "name");
                 String pass = jsonVal(body, "password");
@@ -560,12 +558,10 @@ public class PosServer {
                 if (name == null || pass == null) { sendJson(ex, 400, "{"error":"name and password required"}"); return; }
                 try (Connection c = DatabaseManager.getConnection()) {
                     if (idStr != null) {
-                        // Update
                         PreparedStatement ps = c.prepareStatement("UPDATE staff SET name=?, password_hash=? WHERE id=?");
                         ps.setString(1, name); ps.setString(2, pass); ps.setInt(3, Integer.parseInt(idStr));
                         ps.executeUpdate();
                     } else {
-                        // Insert
                         PreparedStatement ps = c.prepareStatement("INSERT INTO staff (name, password_hash) VALUES (?,?)");
                         ps.setString(1, name); ps.setString(2, pass);
                         ps.executeUpdate();
@@ -574,7 +570,6 @@ public class PosServer {
                 sendJson(ex, 200, "{"ok":true}");
 
             } else if ("DELETE".equals(method)) {
-                // Delete employee by id in query string
                 String query = ex.getRequestURI().getQuery();
                 if (query == null || !query.startsWith("id=")) { sendJson(ex, 400, "{"error":"Missing id"}"); return; }
                 int id = Integer.parseInt(query.split("=")[1]);
