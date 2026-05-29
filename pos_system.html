@@ -491,6 +491,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
               <div class="tab active" id="sales-tab-all" onclick="setSalesTab('all',this)">All</div>
               <div class="tab" id="sales-tab-completed" onclick="setSalesTab('completed',this)">Completed</div>
               <div class="tab" id="sales-tab-pending" onclick="setSalesTab('pending',this)">Pending <span id="pending-count-badge" style="font-size:10px;background:rgba(232,168,48,.2);color:#E8A830;border-radius:10px;padding:1px 6px;margin-left:2px"></span></div>
+              <div class="tab" id="sales-tab-pending" onclick="setSalesTab('pending',this)">Pending <span id="pending-count-badge" style="font-size:10px;background:rgba(232,168,48,.2);color:#E8A830;border-radius:10px;padding:1px 6px;margin-left:2px"></span></div>
             </div>
           </div>
           <div class="search-wrap" style="max-width:280px;margin:0">
@@ -1362,12 +1363,20 @@ async function markOrderComplete(orderId, idx){
   try {
     await fetch(`${API}/orders/status`,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({orderId, status:'Completed'})});
-    // Update local cache
-    if(window._salesOrders && window._salesOrders[idx]){
-      window._salesOrders[idx].orderStatus = 'Completed';
-    }
     showToast('✓ Order marked as Completed');
-    renderSalesHistory(); // reload
+    window._salesOrders = []; allSalesRows = [];
+    renderSalesHistory();
+  } catch(e){ showToast('⚠ Could not update order status'); }
+}
+
+async function markOrderPending(orderId, idx){
+  if(!confirm('Revert order #'+String(orderId).padStart(4,'0')+' to Pending?')) return;
+  try {
+    await fetch(`${API}/orders/status`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({orderId, status:'Pending'})});
+    showToast('↩ Order reverted to Pending');
+    window._salesOrders = []; allSalesRows = [];
+    renderSalesHistory();
   } catch(e){ showToast('⚠ Could not update order status'); }
 }
 
@@ -1872,7 +1881,10 @@ async function renderSales(){
       <td><span class="cat-tag" style="background:${o.discountType?'#EFF4FB':'var(--bg)'};color:${o.discountType?'var(--accent)':'var(--muted)'}">${o.discountType||'None'}</span></td>
       <td style="display:flex;gap:4px;align-items:center">
         <span style="font-size:10px;padding:2px 8px;border-radius:10px;white-space:nowrap;background:${o.orderStatus==='Pending'?'rgba(232,168,48,.15)':'rgba(29,158,117,.12)'};color:${o.orderStatus==='Pending'?'#E8A830':'#1D9E75'}">${o.orderStatus||'Completed'}</span>
-        ${o.orderStatus==='Pending'?`<button class="receipt-btn" style="font-size:11px;color:#1D9E75;border-color:rgba(29,158,117,.3);white-space:nowrap" onclick="markOrderComplete(${o.orderId},${idx})">✓ Done</button>`:''}
+        ${o.orderStatus==='Pending'
+          ? `<button style="font-size:11px;padding:4px 10px;background:#1D9E75;color:#fff;border:none;border-radius:7px;cursor:pointer;white-space:nowrap;font-weight:600" onclick="markOrderComplete(${o.orderId},${idx})"><i class="ti ti-check"></i> Mark Done</button>`
+          : `<button style="font-size:11px;padding:4px 10px;background:transparent;color:#E8A830;border:1px solid rgba(232,168,48,.3);border-radius:7px;cursor:pointer;white-space:nowrap" onclick="markOrderPending(${o.orderId},${idx})">↩ Revert</button>`
+        }
         <button class="receipt-btn" data-idx="${idx}" onclick="viewSalesReceipt(${idx})"><i class="ti ti-receipt"></i></button>
       </td>
     </tr>`);
