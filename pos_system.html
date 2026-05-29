@@ -1877,10 +1877,6 @@ function buildReceiptHTML(inv){
   const discRow = inv.disc > 0
     ? `<div class="r-tot-row disc"><span><i class="ti ti-discount-2" style="font-size:13px;vertical-align:-1px"></i> ${inv.discType} (20%)</span><span>-₱${(+inv.disc).toFixed(2)}</span></div>` : '';
 
-  const pointsRows = inv.payment==='Points'
-    ? `<div class="r-tot-row" style="color:#E8A830;font-weight:600"><span>Points Used</span><span>${Math.ceil(+inv.total)} pts</span></div>` : '';
-  const earnedRow = inv.payment!=='Points' && inv.pointsEarned
-    ? `<div class="r-tot-row" style="color:#1D9E75;font-size:12px"><span>🎯 Points Earned</span><span>+${inv.pointsEarned} pts</span></div>` : '';
   const cashRows = inv.payment==='Cash' && inv.cashTendered
     ? `<div class="r-tot-row" style="color:var(--mid)"><span>Cash Tendered</span><span>₱${(+inv.cashTendered).toFixed(2)}</span></div>
        <div class="r-tot-row" style="color:var(--success);font-weight:600"><span>Change</span><span>₱${(inv.change!=null?(+inv.change):((+inv.cashTendered)-(+inv.total))).toFixed(2)}</span></div>` : '';
