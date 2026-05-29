@@ -401,6 +401,9 @@ tbody td{padding:10px 14px;color:var(--dark)}
   <div class="nav-login-wrap" id="nav-login-wrap">
     <div class="nav-item" id="nav-login-btn" onclick="openLoginModal()"><i class="ti ti-lock"></i> Staff Login</div>
   </div>
+  <div class="nav-login-wrap" id="nav-staff-login-always" style="border-top:none;padding-top:0">
+    <div class="nav-item" onclick="openLoginModal()" style="color:rgba(91,164,255,.6);font-size:12px;justify-content:center;gap:6px;padding:7px 10px"><i class="ti ti-shield-lock"></i> Staff Login</div>
+  </div>
   <div class="staff-footer" id="staff-footer" style="display:none">
     <div class="avatar" id="staff-avatar">?</div>
     <div class="staff-info">
@@ -419,12 +422,13 @@ tbody td{padding:10px 14px;color:var(--dark)}
       <input type="text" id="search-input" placeholder="Search by name or ID…" oninput="filterProducts(this.value)">
     </div>
     <div class="topbar-right">
-      <div id="customer-badge-wrap" style="display:none">
+      <div id="customer-badge-wrap" style="display:none;align-items:center;gap:8px">
         <div class="customer-badge" onclick="showMyOrders()">
           <div class="c-avatar" id="cust-avatar">?</div>
           <span class="c-name" id="cust-name-badge">Guest</span>
           <i class="ti ti-chevron-down" style="font-size:13px;color:var(--muted)"></i>
         </div>
+        <button class="btn-outline" onclick="signOutCustomer()" style="font-size:12px;padding:5px 12px;display:flex;align-items:center;gap:5px"><i class="ti ti-logout"></i> Sign Out</button>
       </div>
       <div class="db-pill"><span class="db-dot"></span> DB Connected</div>
       <div class="icon-btn" title="Print"><i class="ti ti-printer"></i></div>
@@ -1662,6 +1666,7 @@ async function logout(){
   currentUser=null;
   document.getElementById('staff-footer').style.display='none';
   document.getElementById('nav-login-wrap').style.display='block';
+  document.getElementById('nav-staff-login-always').style.display='none';
   document.getElementById('nav-employees').style.display='none';
   document.getElementById('nav-logout-btn').style.display='none';
   document.getElementById('staff-submenu').style.display='none';
@@ -1733,6 +1738,7 @@ function setCustomer(data){
   document.getElementById('staff-submenu').style.display='none';
   document.getElementById('nav-login-wrap').style.display='none';
   document.getElementById('staff-footer').style.display='none';
+  document.getElementById('nav-staff-login-always').style.display='block';
   // Show loyalty nav
   document.getElementById('nav-loyalty').style.display='flex';
   updateLoyaltyBadge(currentCustomer.loyaltyPoints);
@@ -1759,6 +1765,7 @@ function signOutCustomer(){
   document.getElementById('nav-label-staff').style.display='';
   document.getElementById('nav-staff-toggle').style.display='';
   document.getElementById('nav-login-wrap').style.display='block';
+  document.getElementById('nav-staff-login-always').style.display='none';
   // Hide loyalty nav
   document.getElementById('nav-loyalty').style.display='none';
   // Hide points payment
