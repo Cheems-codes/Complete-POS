@@ -393,7 +393,10 @@ tbody td{padding:10px 14px;color:var(--dark)}
       <div class="nav-item nav-sub" id="nav-restock-log" onclick="requireLogin('restock-log',this)"><i class="ti ti-rotate-clockwise-2"></i> Restock Log</div>
       <div class="nav-item nav-sub" id="nav-timelog" onclick="requireLogin('timelog',this)"><i class="ti ti-clock"></i> Time Logs</div>
       <div class="nav-item nav-sub" id="nav-audit" onclick="requireLogin('audit',this)"><i class="ti ti-shield-check"></i> Audit Trail</div>
+      <div class="nav-item nav-sub" id="nav-delivery" onclick="requireLogin('delivery',this)"><i class="ti ti-truck-delivery"></i> Delivery Logs</div>
+      <div class="nav-item nav-sub" id="nav-products-manage" onclick="requireLogin('products-manage',this)"><i class="ti ti-box"></i> Product Management</div>
       <div class="nav-item nav-sub" id="nav-employees" onclick="requireLogin('employees',this)" style="display:none"><i class="ti ti-users"></i> Employee Profiles</div>
+      <div class="nav-item nav-sub" id="nav-store-settings" onclick="openStoreSettings()" style="display:none"><i class="ti ti-settings"></i> Store Settings</div>
       <div class="nav-item nav-sub" id="nav-logout-btn" style="display:none" onclick="logout()"><i class="ti ti-logout"></i> Logout</div>
     </div>
   </div>
@@ -564,7 +567,13 @@ tbody td{padding:10px 14px;color:var(--dark)}
       <div class="view-body">
         <div class="view-head">
           <div class="view-h" id="my-orders-title">My Order History</div>
-          <button class="btn-outline" onclick="signOutCustomer()"><i class="ti ti-logout"></i> Sign Out</button>
+        </div>
+        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;align-items:flex-end;gap:12px">
+          <div style="flex:1">
+            <label style="font-size:12px;color:var(--muted);font-weight:500;display:block;margin-bottom:6px"><i class="ti ti-map-pin"></i> Delivery Address</label>
+            <input type="text" id="customer-address-input" placeholder="Enter your delivery address for orders…" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;box-sizing:border-box">
+          </div>
+          <button class="btn-primary" onclick="saveCustomerAddress()" style="white-space:nowrap;padding:9px 16px"><i class="ti ti-check"></i> Save</button>
         </div>
         <div id="my-orders-content">
           <div class="my-orders-empty"><i class="ti ti-receipt-off"></i><p>No orders yet</p><span>Your completed orders will appear here</span></div>
@@ -582,6 +591,87 @@ tbody td{padding:10px 14px;color:var(--dark)}
           </div>
         </div>
         <div id="loyalty-content"></div>
+      </div>
+    </div>
+
+    <!-- DELIVERY LOGS VIEW -->
+    <div class="view" id="view-delivery">
+      <div class="view-body">
+        <div class="view-head"><div class="view-h">Delivery Logs</div></div>
+        <div id="delivery-list" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+    </div>
+
+    <!-- PRODUCT MANAGEMENT VIEW -->
+    <div class="view" id="view-products-manage">
+      <div class="view-body">
+        <div class="view-head">
+          <div><div class="view-h">Product Management</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Add or remove products from inventory</div></div>
+          <button class="btn-primary" onclick="openAddProductModal()"><i class="ti ti-plus"></i> Add Product</button>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Par Level</th><th>Expiry</th><th></th></tr></thead>
+          <tbody id="products-manage-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADD PRODUCT MODAL -->
+    <div class="modal-bg" id="product-modal">
+      <div class="login-modal" style="width:400px">
+        <h3 id="product-modal-title">Add Product</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-row"><label>Product ID</label><input type="text" id="prod-id" placeholder="e.g. 501"></div>
+          <div class="form-row"><label>Category</label>
+            <select id="prod-cat" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px">
+              <option>Grains</option><option>Dairy</option><option>Canned</option><option>Snacks</option><option>General</option>
+            </select>
+          </div>
+          <div class="form-row" style="grid-column:1/-1"><label>Product Name</label><input type="text" id="prod-name" placeholder="e.g. Basmati Rice 1kg"></div>
+          <div class="form-row"><label>Price (₱)</label><input type="number" id="prod-price" placeholder="0.00" step="0.01"></div>
+          <div class="form-row"><label>Initial Stock</label><input type="number" id="prod-stock" placeholder="0"></div>
+          <div class="form-row"><label>Par Level</label><input type="number" id="prod-par" placeholder="5"></div>
+          <div class="form-row"><label>Expiry Date</label><input type="date" id="prod-expiry"></div>
+        </div>
+        <div class="login-err" id="product-err" style="display:none">ID and Name are required.</div>
+        <div class="modal-btns" style="margin-top:14px">
+          <button class="btn-primary" onclick="saveProduct()"><i class="ti ti-check"></i> Save</button>
+          <button class="btn-outline" onclick="closeProductModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORE SETTINGS MODAL -->
+    <div class="modal-bg" id="store-modal">
+      <div class="login-modal">
+        <h3>Store Settings</h3>
+        <p class="sub">Update your store information</p>
+        <div class="form-row"><label>Store Name</label><input type="text" id="store-name" placeholder="e.g. Tyrone's Store"></div>
+        <div class="form-row"><label>Store Address</label><input type="text" id="store-address" placeholder="Full address"></div>
+        <div class="form-row"><label>Phone</label><input type="text" id="store-phone" placeholder="09XXXXXXXXX"></div>
+        <div class="modal-btns">
+          <button class="btn-primary" onclick="saveStoreSettings()"><i class="ti ti-check"></i> Save</button>
+          <button class="btn-outline" onclick="document.getElementById('store-modal').classList.remove('open')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULFILLMENT MODAL (after checkout) -->
+    <div class="modal-bg" id="fulfillment-modal">
+      <div class="login-modal">
+        <h3>How would you like to receive your order?</h3>
+        <p class="sub" id="fulfillment-sub">Choose pickup or delivery</p>
+        <div style="display:flex;flex-direction:column;gap:10px;margin:16px 0">
+          <div id="pickup-option" onclick="selectFulfillment('pickup')" style="border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:12px">
+            <i class="ti ti-building-store" style="font-size:24px;color:var(--accent2)"></i>
+            <div><div style="font-weight:600">Pick Up</div><div id="store-addr-display" style="font-size:12px;color:var(--muted)">Loading store address…</div></div>
+          </div>
+          <div id="delivery-option" onclick="selectFulfillment('delivery')" style="border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:12px">
+            <i class="ti ti-truck-delivery" style="font-size:24px;color:var(--accent2)"></i>
+            <div><div style="font-weight:600">Delivery</div><div id="delivery-addr-display" style="font-size:12px;color:var(--muted)">Your saved address</div></div>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="confirmFulfillment()"><i class="ti ti-check"></i> Confirm</button>
       </div>
     </div>
 
@@ -647,6 +737,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
       <button class="pay-btn" id="pay-gcash" onclick="setPayment('GCash')"><i class="ti ti-device-mobile"></i> GCash</button>
       <button class="pay-btn" id="pay-other" onclick="setPayment('Other')"><i class="ti ti-wallet"></i> Other</button>
       <button class="pay-btn" id="pay-points" onclick="setPayment('Points')" style="display:none"><i class="ti ti-star"></i> Points</button>
+      <button class="pay-btn" id="pay-cheque" onclick="setPayment('Cheque')"><i class="ti ti-writing"></i> Cheque</button>
     </div>
     <div id="points-info" style="display:none;font-size:12px;color:var(--accent2);padding:6px 0;text-align:center"></div>
     <div class="cash-fields" id="cash-fields">
@@ -959,6 +1050,223 @@ function closeEmpModal(){
   document.getElementById('emp-modal').classList.remove('open');
 }
 
+// ════════════ STORE SETTINGS ════════════
+let _storeInfo = {name:"Tyrone's POS", address:null, phone:null};
+
+async function loadStoreInfo(){
+  try {
+    const res = await fetch(`${API}/store`);
+    _storeInfo = await res.json();
+  } catch(e){}
+  return _storeInfo;
+}
+
+async function openStoreSettings(){
+  await loadStoreInfo();
+  document.getElementById('store-name').value = _storeInfo.name||'';
+  document.getElementById('store-address').value = _storeInfo.address||'';
+  document.getElementById('store-phone').value = _storeInfo.phone||'';
+  document.getElementById('store-modal').classList.add('open');
+}
+
+async function saveStoreSettings(){
+  const name = document.getElementById('store-name').value.trim();
+  const address = document.getElementById('store-address').value.trim();
+  const phone = document.getElementById('store-phone').value.trim();
+  try {
+    await fetch(`${API}/store`, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({name, address, phone})});
+    _storeInfo = {name, address, phone};
+    showToast('✓ Store settings saved');
+    document.getElementById('store-modal').classList.remove('open');
+  } catch(e){ showToast('⚠ Could not save store settings'); }
+}
+
+// ════════════ CUSTOMER ADDRESS ════════════
+async function loadCustomerAddress(){
+  if(!currentCustomer) return;
+  try {
+    const res = await fetch(`${API}/customer/address?customerId=${currentCustomer.customerId}`);
+    const data = await res.json();
+    currentCustomer.address = data.address||'';
+    const inp = document.getElementById('customer-address-input');
+    if(inp) inp.value = currentCustomer.address;
+  } catch(e){}
+}
+
+async function saveCustomerAddress(){
+  if(!currentCustomer) return;
+  const address = document.getElementById('customer-address-input').value.trim();
+  try {
+    await fetch(`${API}/customer/address`, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({customerId: currentCustomer.customerId, address})});
+    currentCustomer.address = address;
+    showToast('✓ Address saved');
+  } catch(e){ showToast('⚠ Could not save address'); }
+}
+
+// ════════════ FULFILLMENT MODAL ════════════
+async function showFulfillmentModal(invObj){
+  await loadStoreInfo();
+  const storeAddr = _storeInfo.address || 'Address not set — contact manager';
+  document.getElementById('store-addr-display').textContent = storeAddr;
+  const custAddr = currentCustomer?.address;
+  const deliveryOpt = document.getElementById('delivery-option');
+  if(custAddr){
+    document.getElementById('delivery-addr-display').textContent = custAddr;
+    deliveryOpt.style.opacity='1'; deliveryOpt.style.pointerEvents='';
+  } else {
+    document.getElementById('delivery-addr-display').textContent = 'No address on file — add in My Orders';
+    deliveryOpt.style.opacity='0.4'; deliveryOpt.style.pointerEvents='none';
+  }
+  // Default to pickup
+  window._selectedFulfillment = 'pickup';
+  document.getElementById('pickup-option').style.borderColor='var(--accent)';
+  document.getElementById('delivery-option').style.borderColor='var(--border)';
+  document.getElementById('fulfillment-modal').classList.add('open');
+}
+
+function selectFulfillment(type){
+  window._selectedFulfillment = type;
+  document.getElementById('pickup-option').style.borderColor = type==='pickup'?'var(--accent)':'var(--border)';
+  document.getElementById('delivery-option').style.borderColor = type==='delivery'?'var(--accent)':'var(--border)';
+}
+
+async function confirmFulfillment(){
+  const type = window._selectedFulfillment || 'pickup';
+  const invObj = window._pendingInvObj;
+  const orderId = window._pendingOrderId;
+  document.getElementById('fulfillment-modal').classList.remove('open');
+
+  // Add fulfillment info to invoice
+  invObj.fulfillment = type;
+  invObj.deliveryAddress = type==='delivery' ? currentCustomer?.address : _storeInfo.address;
+  invObj.storeAddress = _storeInfo.address;
+
+  // If delivery, save delivery log
+  if(type==='delivery' && currentCustomer){
+    try {
+      const itemsJson = JSON.stringify(invObj.items.map(i=>({name:i.name,qty:i.qty,unitPrice:i.unitPrice})));
+      await fetch(`${API}/delivery-logs`, {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          orderId, customerName: currentCustomer.name,
+          deliveryAddress: currentCustomer.address,
+          paymentMethod: invObj.payment,
+          total: invObj.total,
+          itemsJson
+        })});
+    } catch(e){}
+  }
+  showInvoice(invObj);
+}
+
+// ════════════ DELIVERY LOGS ════════════
+async function renderDeliveryLogs(){
+  const el = document.getElementById('delivery-list');
+  el.innerHTML='<div style="color:var(--muted);font-size:13px">Loading…</div>';
+  try {
+    const res = await fetch(`${API}/delivery-logs`);
+    const logs = await res.json();
+    if(!logs.length){ el.innerHTML='<div style="color:var(--muted);padding:40px 0;text-align:center"><i class="ti ti-truck-off" style="font-size:32px;display:block;margin-bottom:8px;opacity:.3"></i>No delivery orders yet</div>'; return; }
+    el.innerHTML = logs.map(d=>{
+      let items = [];
+      try { items = JSON.parse(d.itemsJson||'[]'); } catch(e){}
+      return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(46,124,246,.1);padding:3px 10px;border-radius:20px">#${String(d.orderId).padStart(4,'0')}</span>
+          <span style="font-weight:600">${d.customerName}</span>
+          <span style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;background:${d.status==='Pending'?'rgba(255,180,0,.12)':'rgba(29,158,117,.12)'};color:${d.status==='Pending'?'#E8A830':'#1D9E75'}">${d.status}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px"><i class="ti ti-map-pin" style="margin-right:4px"></i>${d.deliveryAddress}</div>
+        <div style="font-size:12px;margin-bottom:10px">${items.map(i=>`<span style="background:var(--bg);border-radius:6px;padding:2px 8px;margin-right:4px;font-size:11px">${i.qty}x ${i.name}</span>`).join('')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:10px">
+          <span style="font-size:13px;color:var(--muted)">${d.paymentMethod} · ${d.createdAt?.split('T')[0]||d.createdAt?.split(' ')[0]||''}</span>
+          <span style="font-weight:700;color:var(--accent)">₱${(+d.total).toFixed(2)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){ el.innerHTML='<div style="color:var(--danger)">⚠ Could not load delivery logs</div>'; }
+}
+
+// ════════════ PRODUCT MANAGEMENT ════════════
+let _editProductId = null;
+async function renderProductManage(){
+  const tbody = document.getElementById('products-manage-tbody');
+  tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>';
+  try {
+    const res = await fetch(`${API}/products`);
+    const prods = await res.json();
+    tbody.innerHTML = prods.map(p=>`<tr>
+      <td class="mono" style="font-size:11px">${p.id}</td>
+      <td style="font-weight:500">${p.name}</td>
+      <td><span class="cat-tag">${p.category}</span></td>
+      <td class="mono">₱${(+p.price).toFixed(2)}</td>
+      <td class="mono">${p.stock}</td>
+      <td class="mono">${p.parLevel}</td>
+      <td style="font-size:11px;color:var(--muted)">${p.expiryDate||'—'}</td>
+      <td style="display:flex;gap:6px">
+        <button class="receipt-btn" onclick="editProduct('${p.id}','${p.name.replace(/'/g,"\'")}','${p.category}',${p.price},${p.stock},${p.parLevel},'${p.expiryDate||''}')"><i class="ti ti-pencil"></i></button>
+        <button class="receipt-btn" style="color:var(--danger);border-color:rgba(163,45,45,.3)" onclick="deleteProduct('${p.id}','${p.name.replace(/'/g,"\'")}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`).join('');
+  } catch(e){ tbody.innerHTML='<tr><td colspan="8" style="color:var(--danger);text-align:center;padding:24px">⚠ Could not load products</td></tr>'; }
+}
+
+function openAddProductModal(){
+  _editProductId=null;
+  document.getElementById('product-modal-title').textContent='Add Product';
+  ['prod-id','prod-name','prod-price','prod-stock','prod-par','prod-expiry'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('prod-id').disabled=false;
+  document.getElementById('product-err').style.display='none';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function editProduct(id,name,cat,price,stock,par,expiry){
+  _editProductId=id;
+  document.getElementById('product-modal-title').textContent='Edit Product';
+  document.getElementById('prod-id').value=id; document.getElementById('prod-id').disabled=true;
+  document.getElementById('prod-name').value=name;
+  document.getElementById('prod-cat').value=cat;
+  document.getElementById('prod-price').value=price;
+  document.getElementById('prod-stock').value=stock;
+  document.getElementById('prod-par').value=par;
+  document.getElementById('prod-expiry').value=expiry;
+  document.getElementById('product-err').style.display='none';
+  document.getElementById('product-modal').classList.add('open');
+}
+
+async function saveProduct(){
+  const id=document.getElementById('prod-id').value.trim();
+  const name=document.getElementById('prod-name').value.trim();
+  if(!id||!name){ document.getElementById('product-err').style.display='block'; return; }
+  const payload={id,name,category:document.getElementById('prod-cat').value,
+    price:document.getElementById('prod-price').value,
+    stock:document.getElementById('prod-stock').value,
+    parLevel:document.getElementById('prod-par').value,
+    expiryDate:document.getElementById('prod-expiry').value};
+  try {
+    await fetch(`${API}/products/manage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    showToast(`✓ ${name} saved`);
+    closeProductModal();
+    renderProductManage();
+    await loadProducts();
+  loadStoreInfo(); // refresh register
+  } catch(e){ showToast('⚠ Could not save product'); }
+}
+
+async function deleteProduct(id, name){
+  if(!confirm(`Remove ${name} from inventory?`)) return;
+  try {
+    await fetch(`${API}/products/manage?id=${id}`,{method:'DELETE'});
+    showToast(`✓ ${name} removed`);
+    renderProductManage();
+    await loadProducts();
+  loadStoreInfo();
+  } catch(e){ showToast('⚠ Could not remove product'); }
+}
+
+function closeProductModal(){ document.getElementById('product-modal').classList.remove('open'); }
+
 // ════════════ LOYALTY SYSTEM ════════════
 function updateLoyaltyBadge(pts){
   const badge = document.getElementById('nav-points-badge');
@@ -1060,7 +1368,7 @@ function switchView(view, navEl){
   document.getElementById('topbar-title').textContent={
     register:'Register',inventory:'Inventory',sales:'Sales History',
     'restock-log':'Restock Log',timelog:'Time Logs',audit:'Audit Trail',
-    'my-orders':'My Orders','employees':'Employee Profiles','loyalty':'My Points'
+    'my-orders':'My Orders','employees':'Employee Profiles','loyalty':'My Points','delivery':'Delivery Logs','products-manage':'Product Management'
   }[view]||view;
   const isRegister = view==='register';
   document.getElementById('search-bar').style.display=isRegister?'':'none';
@@ -1074,6 +1382,8 @@ function switchView(view, navEl){
   if(view==='audit') renderAuditTrail();
   if(view==='employees') renderEmployees();
   if(view==='loyalty') renderLoyalty();
+  if(view==='delivery') renderDeliveryLogs();
+  if(view==='products-manage') renderProductManage();
   if(view==='my-orders') renderMyOrders();
 }
 
@@ -1225,12 +1535,13 @@ function toggleDisc(type){
 // ════════════ PAYMENT ════════════
 function setPayment(method){
   payMethod=method;
-  ['Cash','Card','GCash','Other','Points'].forEach(m=>{
+  ['Cash','Card','GCash','Other','Points','Cheque'].forEach(m=>{
     const btn=document.getElementById('pay-'+m.toLowerCase());
     if(btn) btn.classList.toggle('active',payMethod===m);
   });
   document.getElementById('cash-fields').style.display=method==='Cash'?'block':'none';
-  document.getElementById('digital-fields').style.display=(method==='Card'||method==='GCash')?'block':'none';
+  document.getElementById('digital-fields').style.display=(method==='Card'||method==='GCash'||method==='Cheque')?'block':'none';
+  if(method==='Cheque') document.getElementById('account-info').placeholder='Cheque Number';
   if(method==='Card') document.getElementById('account-info').placeholder='Card Number (11 digits)';
   if(method==='GCash') document.getElementById('account-info').placeholder='GCash Number (09XXXXXXXXX)';
   document.getElementById('cash-tendered').value='';
@@ -1298,12 +1609,17 @@ async function checkout(){
     lastRestocked: INVENTORY[id].lastRestocked
   }));
 
+  const itemsJsonStr = JSON.stringify(ids.map(id=>({name:INVENTORY[id]?.name||id,qty:cart[id],unitPrice:INVENTORY[id]?.price||0})));
   const payload = {
     subtotal: sub, discountType: activeDisc, discountIdNumber: null,
     discountAmount: disc, total,
     paymentMethod: payMethod, accountInfo,
     cashTendered, changeAmount: cashTendered!=null ? cashTendered-total : null,
     customerId: currentCustomer ? currentCustomer.customerId : -1,
+    customerName: currentCustomer ? currentCustomer.name : 'Guest',
+    fulfillment: window._selectedFulfillment||'pickup',
+    deliveryAddress: window._selectedFulfillment==='delivery' ? (currentCustomer?.address||null) : null,
+    itemsJson: itemsJsonStr,
     items
   };
 
@@ -1367,7 +1683,9 @@ async function checkout(){
     })),
     customerName: currentCustomer ? currentCustomer.name : 'Guest'
   };
-  showInvoice(invObj);
+  window._pendingInvObj = invObj;
+  window._pendingOrderId = savedOrderId;
+  showFulfillmentModal(invObj);
 
   const itemCount=ids.reduce((s,id)=>s+cart[id],0);
   totalRevenue+=total; totalItems+=itemCount; sessionOrders++; totalDiscounts+=disc;
@@ -1643,7 +1961,10 @@ async function doLogin(){
     document.getElementById('staff-name-display').textContent=user.name;
     document.getElementById('staff-role-display').textContent=user.role+' — Logged in';
     document.getElementById('nav-login-wrap').style.display='none';
-    if(user.role==='Manager') document.getElementById('nav-employees').style.display='flex';
+    if(user.role==='Manager'){
+      document.getElementById('nav-employees').style.display='flex';
+      document.getElementById('nav-store-settings').style.display='flex';
+    }
     document.getElementById('nav-logout-btn').style.display='flex';
     document.getElementById('staff-submenu').style.display='block';
     document.getElementById('staff-chevron').style.transform='rotate(180deg)';
@@ -1670,6 +1991,7 @@ async function logout(){
   document.getElementById('nav-login-wrap').style.display='block';
   document.getElementById('nav-staff-login-always').style.display='none';
   document.getElementById('nav-employees').style.display='none';
+  document.getElementById('nav-store-settings').style.display='none';
   document.getElementById('nav-logout-btn').style.display='none';
   document.getElementById('staff-submenu').style.display='none';
   document.getElementById('staff-chevron').style.transform='rotate(0deg)';
@@ -1791,6 +2113,7 @@ function showMyOrders(){
 }
 
 async function renderMyOrders(){
+  await loadCustomerAddress();
   const container = document.getElementById('my-orders-content');
   if(!currentCustomer){ 
     container.innerHTML = '<div class="my-orders-empty"><i class="ti ti-user-off"></i><p>Not signed in</p><span>Sign in to view your orders</span></div>';
@@ -1866,8 +2189,10 @@ function buildReceiptHTML(inv){
   const dateStr = inv.orderDate
     ? new Date(inv.orderDate).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})
     : new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
-  const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet', Points:'ti-star'};
+  const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet', Points:'ti-star', Cheque:'ti-writing'};
   const payIcon = payIcons[inv.payment] || 'ti-wallet';
+  const fulfillmentRow = inv.fulfillment
+    ? `<div class="r-tot-row" style="font-size:12px;color:var(--muted)"><span>${inv.fulfillment==='delivery'?'🚚 Delivery to':'🏪 Pick Up at'}</span><span style="text-align:right;max-width:180px;font-size:11px">${inv.deliveryAddress||'—'}</span></div>` : '';
 
   // Varied barcode bars
   const bHeights = [28,14,36,20,28,12,32,18,26,10,34,22,28,16,32,14,26,20,34,12,30,18,28,16,36,20,24,14,32,18];
@@ -1920,7 +2245,7 @@ function buildReceiptHTML(inv){
     <div class="receipt-totals">
       <div class="r-tot-row"><span>Subtotal</span><span>₱${(+inv.sub).toFixed(2)}</span></div>
       ${discRow}
-      ${cashRows}${pointsRows}${earnedRow}
+      ${fulfillmentRow}${cashRows}${pointsRows}${earnedRow}
       <div class="r-tot-row grand"><span>Total Paid</span><span>₱${(+inv.total).toFixed(2)}</span></div>
     </div>
     <div class="receipt-payment">

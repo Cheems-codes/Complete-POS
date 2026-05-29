@@ -49,6 +49,10 @@ public class PosServer {
         server.createContext("/api/customer/orders",   new CustomerOrdersHandler());
         server.createContext("/api/staff",             new StaffHandler());
         server.createContext("/api/customer/points",   new CustomerPointsHandler());
+        server.createContext("/api/customer/address",  new CustomerAddressHandler());
+        server.createContext("/api/store",             new StoreHandler());
+        server.createContext("/api/delivery-logs",     new DeliveryLogsHandler());
+        server.createContext("/api/products/manage",   new ProductManageHandler());
         server.createContext("/",                  new StaticHandler());   // serves pos_system.html
 
         server.setExecutor(null);
@@ -305,6 +309,9 @@ public class PosServer {
                 double total          = dbl(body, "total");
                 String paymentMethod  = jsonVal(body, "paymentMethod");
                 String accountInfo    = jsonVal(body, "accountInfo");
+                String fulfillment   = jsonVal(body, "fulfillment"); // "pickup" or "delivery"
+                String deliveryAddr  = jsonVal(body, "deliveryAddress");
+                String customerName  = jsonVal(body, "customerName");
                 Double cashTendered   = hasKey(body,"cashTendered") ? dbl(body,"cashTendered") : null;
                 Double changeAmount   = hasKey(body,"changeAmount")  ? dbl(body,"changeAmount")  : null;
                 int customerId        = hasKey(body,"customerId") ? (int)dbl(body,"customerId") : -1;
@@ -374,6 +381,19 @@ public class PosServer {
                 DatabaseManager.saveAuditEvent("SALE",
                     "Order#" + orderId + " | Total: " + String.format("%.2f", total) +
                     " | Payment: " + paymentMethod);
+
+                // Save delivery log if customer chose delivery
+                if ("delivery".equals(fulfillment) && deliveryAddr != null) {
+                    String itemsJsonStr = jsonVal(body, "itemsJson");
+                    try (Connection cd = DatabaseManager.getConnection();
+                         PreparedStatement pd = cd.prepareStatement(
+                             "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,\'Pending\',?)")) {
+                        pd.setInt(1, orderId); pd.setString(2, customerName != null ? customerName : "Guest");
+                        pd.setString(3, deliveryAddr); pd.setString(4, paymentMethod);
+                        pd.setDouble(5, total); pd.setString(6, itemsJsonStr);
+                        pd.executeUpdate();
+                    } catch (Exception ignored) {}
+                }
 
                 sendJson(ex, 200, "{\"ok\":true,\"orderId\":" + orderId + ",\"loyaltyPoints\":" + updatedPoints + "}");
 
@@ -639,6 +659,131 @@ public class PosServer {
             } else {
                 sendJson(ex, 405, "{\"error\":\"Method not allowed\"}");
             }
+        }
+    }
+
+    // ── GET/PUT /api/customer/address ────────────────────────────────────────
+    static class CustomerAddressHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            if ("GET".equals(ex.getRequestMethod())) {
+                String q = ex.getRequestURI().getQuery();
+                int cid = -1;
+                if (q != null && q.contains("customerId=")) try { cid = Integer.parseInt(q.split("customerId=")[1].split("&")[0]); } catch (Exception e2) {}
+                if (cid < 0) { sendJson(ex, 400, "{\"error\":\"Missing customerId\"}"); return; }
+                try (Connection c = DatabaseManager.getConnection();
+                     PreparedStatement ps = c.prepareStatement("SELECT address FROM customers WHERE customer_id=?")) {
+                    ps.setInt(1, cid); ResultSet rs = ps.executeQuery();
+                    if (rs.next()) sendJson(ex, 200, "{\"address\":" + q(rs.getString("address")) + "}");
+                    else sendJson(ex, 404, "{\"address\":null}");
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
+            } else if ("POST".equals(ex.getRequestMethod())) {
+                String body = readBody(ex);
+                String idStr = jsonVal(body, "customerId");
+                String address = jsonVal(body, "address");
+                if (idStr == null) { sendJson(ex, 400, "{\"error\":\"Missing customerId\"}"); return; }
+                try (Connection c = DatabaseManager.getConnection();
+                     PreparedStatement ps = c.prepareStatement("UPDATE customers SET address=? WHERE customer_id=?")) {
+                    ps.setString(1, address); ps.setInt(2, Integer.parseInt(idStr)); ps.executeUpdate();
+                    sendJson(ex, 200, "{\"ok\":true}");
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
+            } else { sendJson(ex, 405, "{\"error\":\"Method not allowed\"}"); }
+        }
+    }
+
+    // ── GET/POST /api/store ───────────────────────────────────────────────────
+    static class StoreHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            if ("GET".equals(ex.getRequestMethod())) {
+                try (Connection c = DatabaseManager.getConnection();
+                     Statement st = c.createStatement();
+                     ResultSet rs = st.executeQuery("SELECT name, address, phone FROM store_info WHERE id=1")) {
+                    if (rs.next()) sendJson(ex, 200, String.format("{\"name\":%s,\"address\":%s,\"phone\":%s}",
+                        q(rs.getString("name")), q(rs.getString("address")), q(rs.getString("phone"))));
+                    else sendJson(ex, 200, "{\"name\":\"Tyrone\'s POS\",\"address\":null,\"phone\":null}");
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
+            } else if ("POST".equals(ex.getRequestMethod())) {
+                String body = readBody(ex);
+                String name = jsonVal(body, "name"); String address = jsonVal(body, "address"); String phone = jsonVal(body, "phone");
+                try (Connection c = DatabaseManager.getConnection();
+                     PreparedStatement ps = c.prepareStatement(
+                         "INSERT INTO store_info (id,name,address,phone) VALUES (1,?,?,?) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name,address=EXCLUDED.address,phone=EXCLUDED.phone")) {
+                    ps.setString(1, name); ps.setString(2, address); ps.setString(3, phone); ps.executeUpdate();
+                    sendJson(ex, 200, "{\"ok\":true}");
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
+            } else { sendJson(ex, 405, "{\"error\":\"Method not allowed\"}"); }
+        }
+    }
+
+    // ── GET/POST /api/delivery-logs ───────────────────────────────────────────
+    static class DeliveryLogsHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            if ("GET".equals(ex.getRequestMethod())) {
+                StringBuilder sb = new StringBuilder("[");
+                String sql = "SELECT d.id, d.order_id, d.customer_name, d.delivery_address, d.payment_method, d.total, d.status, d.created_at, d.items_json FROM delivery_logs d ORDER BY d.created_at DESC";
+                try (Connection c = DatabaseManager.getConnection(); Statement st = c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                    boolean first = true;
+                    while (rs.next()) {
+                        if (!first) sb.append(",");
+                        sb.append(String.format("{\"id\":%d,\"orderId\":%d,\"customerName\":%s,\"deliveryAddress\":%s,\"paymentMethod\":%s,\"total\":%.2f,\"status\":%s,\"createdAt\":%s,\"itemsJson\":%s}",
+                            rs.getInt("id"), rs.getInt("order_id"), q(rs.getString("customer_name")),
+                            q(rs.getString("delivery_address")), q(rs.getString("payment_method")),
+                            rs.getDouble("total"), q(rs.getString("status")), q(rs.getString("created_at")),
+                            rs.getString("items_json") != null ? rs.getString("items_json") : "[]"));
+                        first = false;
+                    }
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); return; }
+                sb.append("]"); sendJson(ex, 200, sb.toString());
+            } else if ("POST".equals(ex.getRequestMethod())) {
+                String body = readBody(ex);
+                String orderId = jsonVal(body, "orderId"); String customerName = jsonVal(body, "customerName");
+                String deliveryAddress = jsonVal(body, "deliveryAddress"); String paymentMethod = jsonVal(body, "paymentMethod");
+                String total = jsonVal(body, "total"); String itemsJson = jsonVal(body, "itemsJson");
+                try (Connection c = DatabaseManager.getConnection();
+                     PreparedStatement ps = c.prepareStatement(
+                         "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,\'Pending\',?)")) {
+                    ps.setInt(1, orderId != null ? Integer.parseInt(orderId) : 0);
+                    ps.setString(2, customerName); ps.setString(3, deliveryAddress);
+                    ps.setString(4, paymentMethod); ps.setDouble(5, total != null ? Double.parseDouble(total) : 0);
+                    ps.setString(6, itemsJson); ps.executeUpdate();
+                    sendJson(ex, 200, "{\"ok\":true}");
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
+            } else { sendJson(ex, 405, "{\"error\":\"Method not allowed\"}"); }
+        }
+    }
+
+    // ── GET/POST/DELETE /api/products/manage ─────────────────────────────────
+    static class ProductManageHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            String method = ex.getRequestMethod();
+            if ("POST".equals(method)) {
+                String body = readBody(ex);
+                String id = jsonVal(body, "id"); String name = jsonVal(body, "name");
+                String category = jsonVal(body, "category"); String price = jsonVal(body, "price");
+                String stock = jsonVal(body, "stock"); String parLevel = jsonVal(body, "parLevel");
+                String expiryDate = jsonVal(body, "expiryDate");
+                if (id == null || name == null) { sendJson(ex, 400, "{\"error\":\"id and name required\"}"); return; }
+                String sql = "INSERT INTO products (id,name,category,stock,par_level,price,expiry_date,last_restocked) VALUES (?,?,?,?,?,?,?,?) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name,category=EXCLUDED.category,price=EXCLUDED.price,par_level=EXCLUDED.par_level,expiry_date=EXCLUDED.expiry_date";
+                try (Connection c = DatabaseManager.getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+                    ps.setString(1, id); ps.setString(2, name); ps.setString(3, category != null ? category : "General");
+                    ps.setInt(4, stock != null ? Integer.parseInt(stock) : 0);
+                    ps.setInt(5, parLevel != null ? Integer.parseInt(parLevel) : 5);
+                    ps.setDouble(6, price != null ? Double.parseDouble(price) : 0);
+                    ps.setString(7, expiryDate); ps.setString(8, "Manual Entry");
+                    ps.executeUpdate(); sendJson(ex, 200, "{\"ok\":true}");
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
+            } else if ("DELETE".equals(method)) {
+                String q = ex.getRequestURI().getQuery();
+                if (q == null || !q.contains("id=")) { sendJson(ex, 400, "{\"error\":\"Missing id\"}"); return; }
+                String id = q.split("id=")[1].split("&")[0];
+                try (Connection c = DatabaseManager.getConnection();
+                     PreparedStatement ps = c.prepareStatement("DELETE FROM products WHERE id=?")) {
+                    ps.setString(1, id); ps.executeUpdate(); sendJson(ex, 200, "{\"ok\":true}");
+                } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
+            } else { sendJson(ex, 405, "{\"error\":\"Method not allowed\"}"); }
         }
     }
 
