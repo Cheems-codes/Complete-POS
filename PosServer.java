@@ -140,7 +140,8 @@ public class PosServer {
                         "{\"orderId\":%d,\"orderDate\":%s,\"subtotal\":%.2f," +
                         "\"discountType\":%s,\"discountAmount\":%.2f,\"total\":%.2f," +
                         "\"paymentMethod\":%s,\"cashTendered\":%s,\"changeAmount\":%s," +
-                        "\"accountInfo\":%s,\"customerName\":%s}",
+                        "\"accountInfo\":%s,\"customerName\":%s," +
+                        "\"fulfillment\":%s,\"deliveryAddress\":%s,\"orderStatus\":%s}",
                         rs.getInt("order_id"), q(rs.getString("order_date")),
                         rs.getDouble("subtotal"), q(rs.getString("discount_type")),
                         rs.getDouble("discount_amount"), rs.getDouble("total"),
@@ -148,7 +149,10 @@ public class PosServer {
                         rs.getObject("cash_tendered") == null ? "null" : rs.getDouble("cash_tendered")+"",
                         rs.getObject("change_amount")  == null ? "null" : rs.getDouble("change_amount")+"",
                         q(rs.getString("account_info")),
-                        q(rs.getString("customer_name"))));
+                        q(rs.getString("customer_name")),
+                        q(rs.getString("fulfillment")),
+                        q(rs.getString("delivery_address")),
+                        q(rs.getString("order_status") != null ? rs.getString("order_status") : "Completed")));
                     first = false;
                 }
             } catch (SQLException e) {
