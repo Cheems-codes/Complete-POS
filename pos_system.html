@@ -422,13 +422,13 @@ tbody td{padding:10px 14px;color:var(--dark)}
       <input type="text" id="search-input" placeholder="Search by name or ID…" oninput="filterProducts(this.value)">
     </div>
     <div class="topbar-right">
-      <div id="customer-badge-wrap" style="display:none;align-items:center;gap:8px">
-        <div class="customer-badge" onclick="showMyOrders()">
+      <div id="customer-badge-wrap" style="display:none;flex-direction:row;align-items:center;gap:8px">
+        <div class="customer-badge" onclick="showMyOrders()" style="margin:0">
           <div class="c-avatar" id="cust-avatar">?</div>
           <span class="c-name" id="cust-name-badge">Guest</span>
           <i class="ti ti-chevron-down" style="font-size:13px;color:var(--muted)"></i>
         </div>
-        <button class="btn-outline" onclick="signOutCustomer()" style="font-size:12px;padding:5px 12px;display:flex;align-items:center;gap:5px;height:32px"><i class="ti ti-logout"></i> Sign Out</button>
+        <button class="btn-outline" onclick="signOutCustomer()" style="font-size:12px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap"><i class="ti ti-logout"></i> Sign Out</button>
       </div>
       <div class="db-pill"><span class="db-dot"></span> DB Connected</div>
       <div class="icon-btn" title="Print"><i class="ti ti-printer"></i></div>
@@ -1749,7 +1749,7 @@ function setCustomer(data){
   if(pointsBtn) pointsBtn.style.display='';
   document.getElementById('cust-avatar').textContent = data.name.charAt(0).toUpperCase();
   document.getElementById('cust-name-badge').textContent = data.name;
-  document.getElementById('customer-badge-wrap').style.display = '';
+  document.getElementById('customer-badge-wrap').style.display = 'flex';
   document.getElementById('nav-my-orders').style.display = 'flex';
 }
 
