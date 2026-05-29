@@ -428,7 +428,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
           <span class="c-name" id="cust-name-badge">Guest</span>
           <i class="ti ti-chevron-down" style="font-size:13px;color:var(--muted)"></i>
         </div>
-        <button class="btn-outline" onclick="signOutCustomer()" style="font-size:12px;padding:5px 12px;display:flex;align-items:center;gap:5px"><i class="ti ti-logout"></i> Sign Out</button>
+        <button class="btn-outline" onclick="signOutCustomer()" style="font-size:12px;padding:5px 12px;display:flex;align-items:center;gap:5px;height:32px"><i class="ti ti-logout"></i> Sign Out</button>
       </div>
       <div class="db-pill"><span class="db-dot"></span> DB Connected</div>
       <div class="icon-btn" title="Print"><i class="ti ti-printer"></i></div>
@@ -459,7 +459,7 @@ tbody td{padding:10px 14px;color:var(--dark)}
         <div class="view-head">
           <div class="view-h">Inventory — Stock Report</div>
           <div style="display:flex;gap:8px;align-items:center">
-            <div class="tab-row" id="inv-tabs">
+            <div class="tab-row" id="inv-tabs" style="margin-bottom:0">
               <div class="tab active" onclick="filterInvCat('All',this)">All</div>
               <div class="tab" onclick="filterInvCat('Grains',this)">Grains</div>
               <div class="tab" onclick="filterInvCat('Dairy',this)">Dairy</div>
@@ -1024,8 +1024,8 @@ async function renderLoyalty(){
       <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px">
         <div style="font-weight:600;margin-bottom:10px">How it works</div>
         <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--muted)">
-          <div><i class="ti ti-plus" style="color:var(--accent2);margin-right:6px"></i>Earn <b>1 point</b> for every ₱1 spent (subtotal before discount)</div>
-          <div><i class="ti ti-star" style="color:var(--accent2);margin-right:6px"></i>Redeem points at checkout — <b>1 point = ₱1</b></div>
+          <div><i class="ti ti-plus" style="color:var(--accent2);margin-right:6px"></i>Earn <b>20 points</b> for every ₱100 spent (subtotal before discount)</div>
+          <div><i class="ti ti-star" style="color:var(--accent2);margin-right:6px"></i>Redeem points at checkout — <b>5 points = ₱1</b></div>
           <div><i class="ti ti-info-circle" style="color:var(--accent2);margin-right:6px"></i>Points are not earned when paying with points</div>
         </div>
       </div>
@@ -1243,11 +1243,12 @@ function setPayment(method){
     const totalEl=document.getElementById('tot-total');
     const total=totalEl?parseFloat(totalEl.textContent.replace('₱',''))||0:0;
     pInfo.style.display='block';
-    if(pts>=total){
-      pInfo.textContent=`✓ You have ${pts} pts — enough to cover ₱${total.toFixed(2)}`;
+    const ptsNeeded = Math.ceil(total*5);
+    if(pts>=ptsNeeded){
+      pInfo.textContent=`✓ You have ${pts} pts — enough to cover ₱${total.toFixed(2)} (costs ${ptsNeeded} pts)`;
       pInfo.style.color='#1D9E75';
     } else {
-      pInfo.textContent=`⚠ You have ${pts} pts (need ${Math.ceil(total)} pts for ₱${total.toFixed(2)})`;
+      pInfo.textContent=`⚠ You have ${pts} pts but need ${ptsNeeded} pts for ₱${total.toFixed(2)}`;
       pInfo.style.color='#A32D2D';
     }
   } else if(pInfo){
@@ -1279,7 +1280,8 @@ async function checkout(){
   }
   if(payMethod==='Points'){
     const pts=currentCustomer?currentCustomer.loyaltyPoints||0:0;
-    if(pts<total){showToast('✘ Insufficient points (need '+Math.ceil(total)+' pts)');return;}
+    const ptsNeeded=Math.ceil(total*5);
+    if(pts<ptsNeeded){showToast('✘ Insufficient points (need '+ptsNeeded+' pts)');return;}
   }
   if((payMethod==='Card'||payMethod==='GCash')&&!document.getElementById('account-info').value.trim()){
     showToast('✘ Please enter account/card number');return;
@@ -1350,7 +1352,7 @@ async function checkout(){
   inv += '*'.repeat(38);
 
   // Build structured invoice object for the new receipt
-  const pointsEarned = payMethod!=='Points' && currentCustomer ? Math.floor(sub) : 0;
+  const pointsEarned = payMethod!=='Points' && currentCustomer ? Math.floor(sub * 0.2) : 0;
   const invObj = {
     orderId: savedOrderId,
     sub, disc, total,
@@ -1888,7 +1890,7 @@ function buildReceiptHTML(inv){
     ? `<div class="r-tot-row" style="color:var(--mid)"><span>Cash Tendered</span><span>₱${(+inv.cashTendered).toFixed(2)}</span></div>
        <div class="r-tot-row" style="color:var(--success);font-weight:600"><span>Change</span><span>₱${(inv.change!=null?(+inv.change):((+inv.cashTendered)-(+inv.total))).toFixed(2)}</span></div>` : '';
   const pointsRows = inv.payment==='Points'
-    ? `<div class="r-tot-row" style="color:#E8A830;font-weight:600"><span>Points Used</span><span>${Math.ceil(+inv.total)} pts</span></div>` : '';
+    ? `<div class="r-tot-row" style="color:#E8A830;font-weight:600"><span>Points Used</span><span>${Math.ceil(+inv.total*5)} pts</span></div>` : '';
   const earnedRow = inv.payment!=='Points' && inv.pointsEarned
     ? `<div class="r-tot-row" style="color:#1D9E75;font-size:12px"><span>🎯 Points Earned</span><span>+${inv.pointsEarned} pts</span></div>` : '';
 

@@ -347,12 +347,12 @@ public class PosServer {
                 if (customerId > 0) {
                     try (Connection cp = DatabaseManager.getConnection()) {
                         if ("Points".equals(paymentMethod)) {
-                            int pointsUsed = (int) Math.ceil(total);
+                            int pointsUsed = (int) Math.ceil(total * 5);
                             PreparedStatement pp = cp.prepareStatement(
                                 "UPDATE customers SET loyalty_points = GREATEST(0, loyalty_points - ?) WHERE customer_id = ?");
                             pp.setInt(1, pointsUsed); pp.setInt(2, customerId); pp.executeUpdate();
                         } else {
-                            int pointsEarned = (int) subtotal;
+                            int pointsEarned = (int)(subtotal * 0.2);
                             PreparedStatement pp = cp.prepareStatement(
                                 "UPDATE customers SET loyalty_points = loyalty_points + ? WHERE customer_id = ?");
                             pp.setInt(1, pointsEarned); pp.setInt(2, customerId); pp.executeUpdate();
