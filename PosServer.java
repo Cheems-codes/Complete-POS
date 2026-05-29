@@ -393,7 +393,8 @@ public class PosServer {
 
                 // Save delivery log if customer chose delivery
                 if ("delivery".equals(fulfillment) && deliveryAddr != null) {
-                    String itemsJsonStr = jsonVal(body, "itemsJson");
+                    String itemsJsonStr = arrayBlock(body, "itemsJson");
+                    if (itemsJsonStr == null || itemsJsonStr.isEmpty()) itemsJsonStr = "[]";
                     try (Connection cd = DatabaseManager.getConnection();
                          PreparedStatement pd = cd.prepareStatement(
                              "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,?,?)")) {
@@ -782,7 +783,9 @@ public class PosServer {
                 String body = readBody(ex);
                 String orderId = jsonVal(body, "orderId"); String customerName = jsonVal(body, "customerName");
                 String deliveryAddress = jsonVal(body, "deliveryAddress"); String paymentMethod = jsonVal(body, "paymentMethod");
-                String total = jsonVal(body, "total"); String itemsJson = jsonVal(body, "itemsJson");
+                String total = jsonVal(body, "total");
+                String itemsJson = arrayBlock(body, "itemsJson");
+                if (itemsJson == null || itemsJson.isEmpty()) itemsJson = "[]";
                 try (Connection c = DatabaseManager.getConnection();
                      PreparedStatement ps = c.prepareStatement(
                          "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,?,?)")) {
