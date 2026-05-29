@@ -484,8 +484,15 @@ tbody td{padding:10px 14px;color:var(--dark)}
     <!-- ══ SALES (manager only — stats shown here) ══ -->
     <div class="view" id="view-sales">
       <div class="view-body">
-        <div class="view-head">
-          <div class="view-h">Sales History</div>
+        <div class="view-head" style="flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px;flex:1">
+            <div class="view-h" style="margin:0">Sales History</div>
+            <div class="tab-row" style="margin-bottom:0">
+              <div class="tab active" id="sales-tab-all" onclick="setSalesTab('all',this)">All</div>
+              <div class="tab" id="sales-tab-completed" onclick="setSalesTab('completed',this)">Completed</div>
+              <div class="tab" id="sales-tab-pending" onclick="setSalesTab('pending',this)">Pending <span id="pending-count-badge" style="font-size:10px;background:rgba(232,168,48,.2);color:#E8A830;border-radius:10px;padding:1px 6px;margin-left:2px"></span></div>
+            </div>
+          </div>
           <div class="search-wrap" style="max-width:280px;margin:0">
             <i class="ti ti-search"></i>
             <input type="text" id="sales-search" placeholder="Search order #, payment, discount…" oninput="filterSalesTable(this.value)" style="width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);font-size:13px;color:var(--dark);outline:none;font-family:'Sora',sans-serif">
@@ -1340,6 +1347,30 @@ async function renderLoyalty(){
     </div>`;
 }
 
+// ════════════ SALES TABS & ORDER STATUS ════════════
+let _currentSalesTab = 'all';
+
+function setSalesTab(tab, el){
+  _currentSalesTab = tab;
+  document.querySelectorAll('#sales-tab-all,#sales-tab-completed,#sales-tab-pending').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  filterSalesTable(document.getElementById('sales-search').value||'');
+}
+
+async function markOrderComplete(orderId, idx){
+  if(!confirm('Mark order #'+String(orderId).padStart(4,'0')+' as Completed?')) return;
+  try {
+    await fetch(`${API}/orders/status`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({orderId, status:'Completed'})});
+    // Update local cache
+    if(window._salesOrders && window._salesOrders[idx]){
+      window._salesOrders[idx].orderStatus = 'Completed';
+    }
+    showToast('✓ Order marked as Completed');
+    renderSalesHistory(); // reload
+  } catch(e){ showToast('⚠ Could not update order status'); }
+}
+
 function togglePw(inputId, btn){
   const inp = document.getElementById(inputId);
   const icon = btn.querySelector('i');
@@ -1827,7 +1858,10 @@ async function renderSales(){
       return;
     }
     window._salesOrders = orders;
-    allSalesRows = orders.map((o,idx)=>`<tr>
+    window._salesOrders = orders;
+    const pendingCount = orders.filter(o=>o.orderStatus==='Pending').length;
+    document.getElementById('pending-count-badge').textContent = pendingCount||'';
+    allSalesRows = orders.map((o,idx)=>`<tr data-status="${o.orderStatus||'Completed'}">
       <td class="mono">#${String(o.orderId).padStart(4,'0')}</td>
       <td class="mono" style="font-size:11px">${(o.orderDate ? new Date(o.orderDate.includes('T')||o.orderDate.includes('Z')?o.orderDate:o.orderDate.replace(' ','T')+'Z').toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Manila'}) : '—')}</td>
       <td style="font-size:12px">${o.customerName||'<span style="color:var(--muted)">Guest</span>'}</td>
@@ -1836,7 +1870,11 @@ async function renderSales(){
       <td class="mono" style="font-weight:600">₱${(+o.total).toFixed(2)}</td>
       <td>${o.paymentMethod||'—'}</td>
       <td><span class="cat-tag" style="background:${o.discountType?'#EFF4FB':'var(--bg)'};color:${o.discountType?'var(--accent)':'var(--muted)'}">${o.discountType||'None'}</span></td>
-      <td><button class="receipt-btn" data-idx="${idx}" onclick="viewSalesReceipt(${idx})"><i class="ti ti-receipt"></i></button></td>
+      <td style="display:flex;gap:4px;align-items:center">
+        <span style="font-size:10px;padding:2px 8px;border-radius:10px;white-space:nowrap;background:${o.orderStatus==='Pending'?'rgba(232,168,48,.15)':'rgba(29,158,117,.12)'};color:${o.orderStatus==='Pending'?'#E8A830':'#1D9E75'}">${o.orderStatus||'Completed'}</span>
+        ${o.orderStatus==='Pending'?`<button class="receipt-btn" style="font-size:11px;color:#1D9E75;border-color:rgba(29,158,117,.3);white-space:nowrap" onclick="markOrderComplete(${o.orderId},${idx})">✓ Done</button>`:''}
+        <button class="receipt-btn" data-idx="${idx}" onclick="viewSalesReceipt(${idx})"><i class="ti ti-receipt"></i></button>
+      </td>
     </tr>`);
     // Apply any active search filter
     const sq = (document.getElementById('sales-search')||{}).value||'';
@@ -2131,7 +2169,8 @@ async function renderMyOrders(){
     }
     window._myOrders = orders;
     container.innerHTML = orders.map((o,idx)=>`
-      <div class="order-card" data-idx="${idx}" data-orderid="${o.orderId}">
+      <div class="order-card" data-idx="${idx}" data-orderid="${o.orderId}" style="position:relative">
+        ${o.orderStatus==='Pending'?`<span style="position:absolute;top:12px;right:12px;font-size:10px;background:rgba(232,168,48,.15);color:#E8A830;border-radius:10px;padding:2px 8px;font-weight:600">⏳ Pending Delivery</span>`:''}
         <div class="order-card-head">
           <span class="order-card-num">#${String(o.orderId).padStart(4,'0')}</span>
           <span class="order-card-date">${(o.orderDate ? new Date(o.orderDate.includes('T')||o.orderDate.includes('Z')?o.orderDate:o.orderDate.replace(' ','T')+'Z').toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Manila'}) : '—')}</span>
@@ -2334,13 +2373,13 @@ function filterSalesTable(q){
   const tbody = document.getElementById('sales-tbody');
   if(!allSalesRows.length) return;
   const sq = q.toLowerCase().trim();
-  if(!sq){
-    tbody.innerHTML = allSalesRows.join('');
-    return;
-  }
-  const filtered = allSalesRows.filter(row => row.toLowerCase().includes(sq));
-  tbody.innerHTML = filtered.length
-    ? filtered.join('')
+  let rows = allSalesRows;
+  // Filter by tab
+  if(_currentSalesTab==='completed') rows = rows.filter(r=>r.includes('data-status="Completed"'));
+  else if(_currentSalesTab==='pending') rows = rows.filter(r=>r.includes('data-status="Pending"'));
+  // Filter by search
+  if(sq) rows = rows.filter(r=>r.toLowerCase().includes(sq));
+  tbody.innerHTML = rows.length ? rows.join('')
     : '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">No matching transactions</td></tr>';
 }
 

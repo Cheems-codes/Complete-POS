@@ -53,6 +53,7 @@ public class PosServer {
         server.createContext("/api/store",             new StoreHandler());
         server.createContext("/api/delivery-logs",     new DeliveryLogsHandler());
         server.createContext("/api/products/manage",   new ProductManageHandler());
+        server.createContext("/api/orders/status",     new OrderStatusHandler());
         server.createContext("/",                  new StaticHandler());   // serves pos_system.html
 
         server.setExecutor(null);
@@ -125,6 +126,7 @@ public class PosServer {
             StringBuilder sb = new StringBuilder("[");
             String sql = "SELECT o.order_id, o.order_date, o.subtotal, o.discount_type, o.discount_amount, " +
                          "o.total, o.payment_method, o.cash_tendered, o.change_amount, o.account_info, " +
+                         "o.fulfillment, o.delivery_address, o.order_status, " +
                          "c.name AS customer_name " +
                          "FROM orders o LEFT JOIN customers c ON o.customer_id = c.customer_id " +
                          "ORDER BY o.order_date DESC";
@@ -320,7 +322,10 @@ public class PosServer {
                 Discount discount = buildDiscount(discountType, discIdNumber);
                 Payment  payment  = buildPayment(paymentMethod, accountInfo, cashTendered, changeAmount);
 
-                int orderId = DatabaseManager.saveOrder(subtotal, discount, payment, discountAmount, total);
+                // Determine order status: delivery = Pending, pickup = Completed
+                String orderStatus = "delivery".equals(fulfillment) ? "Pending" : "Completed";
+                int orderId = DatabaseManager.saveOrderFull(subtotal, discount, payment,
+                    discountAmount, total, customerId, fulfillment, deliveryAddr, orderStatus);
                 // Link order to customer if logged in
                 if (orderId > 0 && customerId > 0) {
                     try (Connection c2 = DatabaseManager.getConnection();
@@ -550,7 +555,8 @@ public class PosServer {
             if (customerId < 0) { sendJson(ex, 400, "{\"error\":\"Missing customerId\"}"); return; }
             StringBuilder sb = new StringBuilder("[");
             String sql = "SELECT o.order_id, o.order_date, o.subtotal, o.discount_type, o.discount_amount, o.total, " +
-                         "o.payment_method, o.account_info, o.cash_tendered, o.change_amount " +
+                         "o.payment_method, o.account_info, o.cash_tendered, o.change_amount, " +
+                         "o.fulfillment, o.delivery_address, o.order_status " +
                          "FROM orders o WHERE o.customer_id = ? ORDER BY o.order_date DESC";
             try (Connection c = DatabaseManager.getConnection();
                  PreparedStatement ps = c.prepareStatement(sql)) {
@@ -569,13 +575,37 @@ public class PosServer {
                       .append("\"paymentMethod\":").append(q(rs.getString("payment_method"))).append(",")
                       .append("\"accountInfo\":").append(q(rs.getString("account_info"))).append(",")
                       .append("\"cashTendered\":").append(rs.getObject("cash_tendered")==null?"null":rs.getDouble("cash_tendered")+"").append(",")
-                      .append("\"changeAmount\":").append(rs.getObject("change_amount")==null?"null":rs.getDouble("change_amount")+"")
+                      .append("\"changeAmount\":").append(rs.getObject("change_amount")==null?"null":rs.getDouble("change_amount")+"").append(",")
+                      .append("\"fulfillment\":").append(q(rs.getString("fulfillment"))).append(",")
+                      .append("\"deliveryAddress\":").append(q(rs.getString("delivery_address"))).append(",")
+                      .append("\"orderStatus\":").append(q(rs.getString("order_status") != null ? rs.getString("order_status") : "Completed"))
                       .append("}");
                     first = false;
                 }
             } catch (SQLException e) { sendJson(ex, 500, escape(e.getMessage())); return; }
             sb.append("]");
             sendJson(ex, 200, sb.toString());
+        }
+    }
+
+    // ── PATCH /api/orders/status ──────────────────────────────────────────────
+    static class OrderStatusHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            if (!"POST".equals(ex.getRequestMethod())) { sendJson(ex, 405, "{\"error\":\"Method not allowed\"}"); return; }
+            String body = readBody(ex);
+            String orderIdStr = jsonVal(body, "orderId");
+            String status = jsonVal(body, "status");
+            if (orderIdStr == null || status == null) { sendJson(ex, 400, "{\"error\":\"Missing orderId or status\"}"); return; }
+            try (Connection c = DatabaseManager.getConnection();
+                 PreparedStatement ps = c.prepareStatement("UPDATE orders SET order_status=? WHERE order_id=?")) {
+                ps.setString(1, status); ps.setInt(2, Integer.parseInt(orderIdStr)); ps.executeUpdate();
+                // Also update delivery_logs status if delivery
+                try (PreparedStatement ps2 = c.prepareStatement("UPDATE delivery_logs SET status=? WHERE order_id=?")) {
+                    ps2.setString(1, status); ps2.setInt(2, Integer.parseInt(orderIdStr)); ps2.executeUpdate();
+                } catch (Exception ignored) {}
+                sendJson(ex, 200, "{\"ok\":true}");
+            } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); }
         }
     }
 

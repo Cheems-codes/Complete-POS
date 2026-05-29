@@ -73,11 +73,18 @@ public class DatabaseManager {
     // PostgreSQL: OUTPUT INSERTED.order_id → RETURNING order_id
     public static int saveOrder(double subtotal, Discount discount, Payment payment,
                                 double discountAmount, double total) {
+        return saveOrderFull(subtotal, discount, payment, discountAmount, total, -1, null, null, "Completed");
+    }
+
+    public static int saveOrderFull(double subtotal, Discount discount, Payment payment,
+                                    double discountAmount, double total,
+                                    int customerId, String fulfillment, String deliveryAddress, String orderStatus) {
         String sql = """
             INSERT INTO orders
               (subtotal, discount_type, discount_id_number, discount_amount,
-               total, payment_method, account_info, cash_tendered, change_amount)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+               total, payment_method, account_info, cash_tendered, change_amount,
+               customer_id, fulfillment, delivery_address, order_status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING order_id
             """;
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
@@ -90,10 +97,14 @@ public class DatabaseManager {
             ps.setString(7, payment instanceof CashPayment ? null : payment.accountInfo);
             ps.setObject(8, payment instanceof CashPayment ? ((CashPayment) payment).amountTendered : null);
             ps.setObject(9, payment instanceof CashPayment ? ((CashPayment) payment).change : null);
+            ps.setObject(10, customerId > 0 ? customerId : null);
+            ps.setString(11, fulfillment);
+            ps.setString(12, deliveryAddress);
+            ps.setString(13, orderStatus != null ? orderStatus : "Completed");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
-            System.out.println("[DB] saveOrder error: " + e.getMessage());
+            System.out.println("[DB] saveOrderFull error: " + e.getMessage());
         }
         return -1;
     }
