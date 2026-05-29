@@ -1142,30 +1142,70 @@ function selectFulfillment(type){
 
 async function confirmFulfillment(){
   const type = window._selectedFulfillment || 'pickup';
-  const invObj = window._pendingInvObj;
-  const orderId = window._pendingOrderId;
   document.getElementById('fulfillment-modal').classList.remove('open');
 
-  // Add fulfillment info to invoice
+  const ck = window._pendingCheckout;
+  if(!ck){ showToast('⚠ Checkout data lost, please retry'); return; }
+
+  const invObj = ck.invObj;
   invObj.fulfillment = type;
   invObj.deliveryAddress = type==='delivery' ? currentCustomer?.address : _storeInfo.address;
   invObj.storeAddress = _storeInfo.address;
 
-  // If delivery, save delivery log
-  if(type==='delivery' && currentCustomer){
-    try {
-      const itemsJson = JSON.stringify(invObj.items.map(i=>({name:i.name,qty:i.qty,unitPrice:i.unitPrice})));
-      await fetch(`${API}/delivery-logs`, {method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          orderId, customerName: currentCustomer.name,
-          deliveryAddress: currentCustomer.address,
-          paymentMethod: invObj.payment,
-          total: invObj.total,
-          itemsJson
-        })});
-    } catch(e){}
+  // Build full payload now that we know fulfillment
+  const payload = {
+    subtotal: ck.sub, discountType: ck.activeDisc, discountIdNumber: null,
+    discountAmount: ck.disc, total: ck.total,
+    paymentMethod: ck.payMethod, accountInfo: ck.accountInfo,
+    cashTendered: ck.cashTendered,
+    changeAmount: ck.cashTendered != null ? ck.cashTendered - ck.total : null,
+    customerId: ck.customerId,
+    customerName: ck.customerName,
+    fulfillment: type,
+    deliveryAddress: type==='delivery' ? (currentCustomer?.address||null) : null,
+    itemsJson: ck.itemsJsonStr,
+    items: ck.ids.map(id=>({
+      productId: id, productName: INVENTORY[id].name,
+      qty: ck.ids ? cart[id]||0 : 0, unitPrice: INVENTORY[id].price,
+      newStock: INVENTORY[id].stock, lastRestocked: INVENTORY[id].lastRestocked
+    }))
+  };
+
+  // Now do the API call
+  let savedOrderId = orderCount;
+  try {
+    const res = await fetch(`${API}/checkout`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error||'Checkout failed');
+    if(!data.orderId) throw new Error('No orderId returned');
+    savedOrderId = data.orderId;
+    if(data.loyaltyPoints != null && currentCustomer){
+      currentCustomer.loyaltyPoints = data.loyaltyPoints;
+      updateLoyaltyBadge(data.loyaltyPoints);
+    }
+  } catch(e){
+    showToast('⚠ DB save failed: ' + e.message);
+    console.error('[Checkout] error:', e.message);
   }
+
+  invObj.orderId = savedOrderId;
+  window._pendingCheckout = null;
   showInvoice(invObj);
+
+  // Reset cart
+  cart={}; activeDisc=null; discId=null;
+  document.querySelectorAll('.disc-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('cash-tendered').value='';
+  document.getElementById('change-line').textContent='';
+  document.getElementById('account-info').value='';
+  document.getElementById('cash-fields').style.display='none';
+  document.getElementById('digital-fields').style.display='none';
+  setPayment('Cash');
+  renderCart(); renderProducts(); updateFab();
+  closeCart();
 }
 
 // ════════════ DELIVERY LOGS ════════════
@@ -1649,73 +1689,20 @@ async function checkout(){
     lastRestocked: INVENTORY[id].lastRestocked
   }));
 
-  const itemsJsonStr = JSON.stringify(ids.map(id=>({name:INVENTORY[id]?.name||id,qty:cart[id],unitPrice:INVENTORY[id]?.price||0})));
-  const payload = {
-    subtotal: sub, discountType: activeDisc, discountIdNumber: null,
-    discountAmount: disc, total,
-    paymentMethod: payMethod, accountInfo,
-    cashTendered, changeAmount: cashTendered!=null ? cashTendered-total : null,
-    customerId: currentCustomer ? currentCustomer.customerId : -1,
-    customerName: currentCustomer ? currentCustomer.name : 'Guest',
-    fulfillment: window._selectedFulfillment||'pickup',
-    deliveryAddress: window._selectedFulfillment==='delivery' ? (currentCustomer?.address||null) : null,
-    itemsJson: itemsJsonStr,
-    items
-  };
-
-  let savedOrderId = orderCount;
-  try {
-    const res = await fetch(`${API}/checkout`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if(!res.ok) throw new Error(data.error||'Checkout failed');
-    if(!data.orderId) throw new Error('No orderId returned');
-    savedOrderId = data.orderId;
-    if(data.loyaltyPoints != null && currentCustomer) {
-      currentCustomer.loyaltyPoints = data.loyaltyPoints;
-      updateLoyaltyBadge(data.loyaltyPoints);
-    }
-  } catch(e){
-    showToast('⚠ DB save failed: ' + e.message);
-    console.error('[API] Checkout error:', e.message);
-  }
-
-  // Build invoice string (mirrors getInvoiceString() from Java)
   const cashTenderedVal = payMethod==='Cash' ? parseFloat(document.getElementById('cash-tendered').value)||0 : null;
   const changeVal = cashTenderedVal != null ? cashTenderedVal - total : null;
-  let inv = '';
-  inv += '*** OFFICIAL INVOICE ***\n';
-  inv += 'Order #: ' + String(savedOrderId).padStart(4,'0') + '\n';
-  inv += 'Date   : ' + new Date().toLocaleString('en-PH') + '\n';
-  inv += '─'.repeat(38) + '\n';
-  ids.forEach(id => {
-    const p = INVENTORY[id]; const qty = cart[id];
-    inv += (p.name).padEnd(22) + ' x' + String(qty).padEnd(4) + ' ₱' + (p.price*qty).toFixed(2) + '\n';
-  });
-  inv += '─'.repeat(38) + '\n';
-  inv += 'SUBTOTAL      : ₱' + sub.toFixed(2) + '\n';
-  if(disc>0) inv += 'DISCOUNT (' + activeDisc + '): -₱' + disc.toFixed(2) + '\n';
-  inv += 'TOTAL         : ₱' + total.toFixed(2) + '\n';
-  inv += 'PAYMENT       : ' + payMethod + '\n';
-  if(cashTenderedVal!=null){
-    inv += 'CASH TENDERED : ₱' + cashTenderedVal.toFixed(2) + '\n';
-    inv += 'CHANGE        : ₱' + changeVal.toFixed(2) + '\n';
-  } else if(accountInfo){
-    inv += 'ACCOUNT NO    : ' + accountInfo + '\n';
-  }
-  inv += '*'.repeat(38);
-
-  // Build structured invoice object for the new receipt
   const pointsEarned = payMethod!=='Points' && currentCustomer ? Math.floor(sub * 0.2) : 0;
+  const itemsJsonStr = JSON.stringify(ids.map(id=>({name:INVENTORY[id]?.name||id,qty:cart[id],unitPrice:INVENTORY[id]?.price||0})));
+
+  // Build invoice object
   const invObj = {
-    orderId: savedOrderId,
+    orderId: null, // set after API call in confirmFulfillment
     sub, disc, total,
     discType: activeDisc || 'None',
     payment: payMethod,
     accountInfo,
     cashTendered: cashTenderedVal,
+    change: changeVal,
     pointsEarned,
     items: ids.map(id => ({
       name: INVENTORY[id].name, icon: INVENTORY[id].icon,
@@ -1723,30 +1710,25 @@ async function checkout(){
     })),
     customerName: currentCustomer ? currentCustomer.name : 'Guest'
   };
-  window._pendingInvObj = invObj;
-  window._pendingOrderId = savedOrderId;
-  window._salesOrders = []; allSalesRows = []; // clear sales cache
+
+  // Store checkout data — API call happens AFTER user picks fulfillment
+  window._pendingCheckout = {
+    ids, sub, disc, total, payMethod, accountInfo,
+    cashTendered: cashTenderedVal, activeDisc, invObj, itemsJsonStr,
+    customerId: currentCustomer ? currentCustomer.customerId : -1,
+    customerName: currentCustomer ? currentCustomer.name : 'Guest',
+  };
+  window._salesOrders = []; allSalesRows = [];
   showFulfillmentModal(invObj);
 
+  // Stats update (cart cleared in confirmFulfillment)
   const itemCount=ids.reduce((s,id)=>s+cart[id],0);
   totalRevenue+=total; totalItems+=itemCount; sessionOrders++; totalDiscounts+=disc;
-  orderCount++;
   document.getElementById('ss-revenue').textContent='₱'+totalRevenue.toFixed(2);
   document.getElementById('ss-orders').textContent=sessionOrders+' orders';
   document.getElementById('ss-avg').textContent='₱'+(totalRevenue/sessionOrders).toFixed(2);
   document.getElementById('ss-disc').textContent='₱'+totalDiscounts.toFixed(2);
   document.getElementById('ss-items').textContent=totalItems;
-
-  cart={}; activeDisc=null;
-  document.querySelectorAll('.disc-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('cash-tendered').value='';
-  document.getElementById('change-line').textContent='';
-  document.getElementById('account-info').value='';
-  document.getElementById('cash-fields').style.display='none';
-  document.getElementById('digital-fields').style.display='none';
-  setPayment('Cash');
-  renderCart(); renderProducts(); updateFab();
-  closeCart();
 }
 
 // ════════════ INVENTORY ════════════
