@@ -387,10 +387,10 @@ public class PosServer {
                     String itemsJsonStr = jsonVal(body, "itemsJson");
                     try (Connection cd = DatabaseManager.getConnection();
                          PreparedStatement pd = cd.prepareStatement(
-                             "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,\'Pending\',?)")) {
+                             "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,?,?)")) {
                         pd.setInt(1, orderId); pd.setString(2, customerName != null ? customerName : "Guest");
                         pd.setString(3, deliveryAddr); pd.setString(4, paymentMethod);
-                        pd.setDouble(5, total); pd.setString(6, itemsJsonStr);
+                        pd.setDouble(5, total); pd.setString(6, "Pending"); pd.setString(7, itemsJsonStr);
                         pd.executeUpdate();
                     } catch (Exception ignored) {}
                 }
@@ -743,11 +743,11 @@ public class PosServer {
                 String total = jsonVal(body, "total"); String itemsJson = jsonVal(body, "itemsJson");
                 try (Connection c = DatabaseManager.getConnection();
                      PreparedStatement ps = c.prepareStatement(
-                         "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,\'Pending\',?)")) {
+                         "INSERT INTO delivery_logs (order_id,customer_name,delivery_address,payment_method,total,status,items_json) VALUES (?,?,?,?,?,?,?)")) {
                     ps.setInt(1, orderId != null ? Integer.parseInt(orderId) : 0);
                     ps.setString(2, customerName); ps.setString(3, deliveryAddress);
                     ps.setString(4, paymentMethod); ps.setDouble(5, total != null ? Double.parseDouble(total) : 0);
-                    ps.setString(6, itemsJson); ps.executeUpdate();
+                    ps.setString(6, "Pending"); ps.setString(7, itemsJson); ps.executeUpdate();
                     sendJson(ex, 200, "{\"ok\":true}");
                 } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); }
             } else { sendJson(ex, 405, "{\"error\":\"Method not allowed\"}"); }

@@ -1685,6 +1685,7 @@ async function checkout(){
   };
   window._pendingInvObj = invObj;
   window._pendingOrderId = savedOrderId;
+  window._salesOrders = []; allSalesRows = []; // clear sales cache
   showFulfillmentModal(invObj);
 
   const itemCount=ids.reduce((s,id)=>s+cart[id],0);
@@ -1828,7 +1829,7 @@ async function renderSales(){
     window._salesOrders = orders;
     allSalesRows = orders.map((o,idx)=>`<tr>
       <td class="mono">#${String(o.orderId).padStart(4,'0')}</td>
-      <td class="mono" style="font-size:11px">${o.orderDate||'—'}</td>
+      <td class="mono" style="font-size:11px">${(o.orderDate ? new Date(o.orderDate.includes('T')||o.orderDate.includes('Z')?o.orderDate:o.orderDate.replace(' ','T')+'Z').toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Manila'}) : '—')}</td>
       <td style="font-size:12px">${o.customerName||'<span style="color:var(--muted)">Guest</span>'}</td>
       <td class="mono">₱${(+o.subtotal).toFixed(2)}</td>
       <td class="mono" style="color:var(--accent2)">-₱${(+o.discountAmount).toFixed(2)}</td>
@@ -2133,7 +2134,7 @@ async function renderMyOrders(){
       <div class="order-card" data-idx="${idx}" data-orderid="${o.orderId}">
         <div class="order-card-head">
           <span class="order-card-num">#${String(o.orderId).padStart(4,'0')}</span>
-          <span class="order-card-date">${o.orderDate||'—'}</span>
+          <span class="order-card-date">${(o.orderDate ? new Date(o.orderDate.includes('T')||o.orderDate.includes('Z')?o.orderDate:o.orderDate.replace(' ','T')+'Z').toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Manila'}) : '—')}</span>
         </div>
         <div class="order-card-total">₱${(+o.total).toFixed(2)}</div>
         <div class="order-card-meta">
@@ -2186,9 +2187,10 @@ function showInvoice(inv){
 
 function buildReceiptHTML(inv){
   const orderNum = String(inv.orderId).padStart(4,'0');
-  const dateStr = inv.orderDate
-    ? new Date(inv.orderDate).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})
-    : new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
+  const rawDate = inv.orderDate
+    ? new Date(inv.orderDate.includes('T')||inv.orderDate.includes('Z') ? inv.orderDate : inv.orderDate.replace(' ','T')+'Z')
+    : new Date();
+  const dateStr = rawDate.toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Manila'});
   const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet', Points:'ti-star', Cheque:'ti-writing'};
   const payIcon = payIcons[inv.payment] || 'ti-wallet';
   const fulfillmentRow = inv.fulfillment
