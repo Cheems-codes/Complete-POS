@@ -2106,7 +2106,9 @@ function guestMode(){
 }
 
 function setCustomer(data){
-  currentCustomer = { customerId: data.customerId, name: data.name, email: data.email, loyaltyPoints: data.loyaltyPoints||0 };
+  currentCustomer = { customerId: data.customerId, name: data.name, email: data.email, loyaltyPoints: data.loyaltyPoints||0, address: data.address||'' };
+  // Load address from DB after login
+  loadCustomerAddress();
   // Hide staff section from customers
   document.getElementById('nav-label-staff').style.display='none';
   document.getElementById('nav-staff-toggle').style.display='none';
@@ -2182,7 +2184,6 @@ async function renderMyOrders(){
     window._myOrders = orders;
     container.innerHTML = orders.map((o,idx)=>`
       <div class="order-card" data-idx="${idx}" data-orderid="${o.orderId}" style="position:relative">
-        ${o.orderStatus==='Pending'?`<span style="position:absolute;top:12px;right:12px;font-size:10px;background:rgba(232,168,48,.15);color:#E8A830;border-radius:10px;padding:2px 8px;font-weight:600">⏳ Pending Delivery</span>`:''}
         <div class="order-card-head">
           <span class="order-card-num">#${String(o.orderId).padStart(4,'0')}</span>
           <span class="order-card-date">${(o.orderDate ? new Date(o.orderDate.includes('T')||o.orderDate.includes('Z')?o.orderDate:o.orderDate.replace(' ','T')+'Z').toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Manila'}) : '—')}</span>
@@ -2191,7 +2192,8 @@ async function renderMyOrders(){
         <div class="order-card-meta">
           <span class="order-pill"><i class="ti ti-cash" style="font-size:11px"></i> ${o.paymentMethod||'—'}</span>
           ${o.discountType ? '<span class="order-pill" style="color:var(--accent2);border-color:var(--accent2)">'+o.discountType+' -₱'+(+o.discountAmount).toFixed(2)+'</span>' : ''}
-          <span class="order-pill" style="color:var(--success);border-color:var(--success)">✓ Completed</span>
+          ${o.fulfillment==='delivery' ? '<span class="order-pill" style="color:#6B7EC9;border-color:#6B7EC9">🚚 Delivery</span>' : '<span class="order-pill">🏪 Pickup</span>'}
+          <span class="order-pill" style="color:${o.orderStatus==='Pending'?'#E8A830':'var(--success)'};border-color:${o.orderStatus==='Pending'?'#E8A830':'var(--success)'};">${o.orderStatus==='Pending'?'⏳ Pending':'✓ Completed'}</span>
         </div>
       </div>`).join('');
     container.querySelectorAll('.order-card').forEach(card => {

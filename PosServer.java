@@ -510,7 +510,7 @@ public class PosServer {
                     StringBuilder sb = new StringBuilder();
                     sb.append("{").append("\"ok\":true,").append("\"customerId\":").append(id)
                       .append(",\"name\":").append(q(name)).append(",\"email\":").append(q(email))
-                      .append(",\"loyaltyPoints\":0}");
+                      .append(",\"loyaltyPoints\":0,\"address\":null}");
                     sendJson(ex, 200, sb.toString());
                 }
             } catch (SQLException e) { sendJson(ex, 500, escape(e.getMessage())); }
@@ -526,7 +526,7 @@ public class PosServer {
             String body  = readBody(ex);
             String email = jsonVal(body, "email");
             String pass  = jsonVal(body, "password");
-            String sql = "SELECT customer_id, name, email, loyalty_points FROM customers WHERE email = ? AND password_hash = ?";
+            String sql = "SELECT customer_id, name, email, loyalty_points, address FROM customers WHERE email = ? AND password_hash = ?";
             try (Connection c = DatabaseManager.getConnection();
                  PreparedStatement ps = c.prepareStatement(sql)) {
                 ps.setString(1, email);
@@ -538,7 +538,7 @@ public class PosServer {
                       .append("\"customerId\":").append(rs.getInt("customer_id")).append(",")
                       .append("\"name\":").append(q(rs.getString("name"))).append(",")
                       .append("\"email\":").append(q(rs.getString("email"))).append(",")
-                      .append("\"loyaltyPoints\":").append(rs.getInt("loyalty_points")).append("}");
+                      .append("\"loyaltyPoints\":").append(rs.getInt("loyalty_points")).append(",").append("\"address\":").append(q(rs.getString("address"))).append("}");
                     sendJson(ex, 200, sb.toString());
                 } else {
                     sendJson(ex, 401, "{\"error\":\"Invalid email or password\"}");
@@ -761,11 +761,19 @@ public class PosServer {
                     boolean first = true;
                     while (rs.next()) {
                         if (!first) sb.append(",");
-                        sb.append(String.format("{\"id\":%d,\"orderId\":%d,\"customerName\":%s,\"deliveryAddress\":%s,\"paymentMethod\":%s,\"total\":%.2f,\"status\":%s,\"createdAt\":%s,\"itemsJson\":%s}",
-                            rs.getInt("id"), rs.getInt("order_id"), q(rs.getString("customer_name")),
-                            q(rs.getString("delivery_address")), q(rs.getString("payment_method")),
-                            rs.getDouble("total"), q(rs.getString("status")), q(rs.getString("created_at")),
-                            rs.getString("items_json") != null ? rs.getString("items_json") : "[]"));
+                        String itemsJsonVal = rs.getString("items_json");
+                        if (itemsJsonVal == null) itemsJsonVal = "[]";
+                        sb.append("{")
+                          .append("\"id\":").append(rs.getInt("id")).append(",")
+                          .append("\"orderId\":").append(rs.getInt("order_id")).append(",")
+                          .append("\"customerName\":").append(q(rs.getString("customer_name"))).append(",")
+                          .append("\"deliveryAddress\":").append(q(rs.getString("delivery_address"))).append(",")
+                          .append("\"paymentMethod\":").append(q(rs.getString("payment_method"))).append(",")
+                          .append("\"total\":").append(String.format("%.2f", rs.getDouble("total"))).append(",")
+                          .append("\"status\":").append(q(rs.getString("status"))).append(",")
+                          .append("\"createdAt\":").append(q(rs.getString("created_at"))).append(",")
+                          .append("\"itemsJson\":").append(itemsJsonVal)
+                          .append("}");
                         first = false;
                     }
                 } catch (SQLException e2) { sendJson(ex, 500, "{\"error\":" + escape(e2.getMessage()) + "}"); return; }
