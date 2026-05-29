@@ -48,6 +48,7 @@ public class PosServer {
         server.createContext("/api/customer/login",    new CustomerLoginHandler());
         server.createContext("/api/customer/orders",   new CustomerOrdersHandler());
         server.createContext("/api/staff",             new StaffHandler());
+        server.createContext("/api/customer/points",   new CustomerPointsHandler());
         server.createContext("/",                  new StaticHandler());   // serves pos_system.html
 
         server.setExecutor(null);
@@ -342,11 +343,39 @@ public class PosServer {
                     DatabaseManager.updateStock(pid, newStock, lastR);
                 }
 
+                // Award/deduct loyalty points
+                if (customerId > 0) {
+                    try (Connection cp = DatabaseManager.getConnection()) {
+                        if ("Points".equals(paymentMethod)) {
+                            int pointsUsed = (int) Math.ceil(total);
+                            PreparedStatement pp = cp.prepareStatement(
+                                "UPDATE customers SET loyalty_points = GREATEST(0, loyalty_points - ?) WHERE customer_id = ?");
+                            pp.setInt(1, pointsUsed); pp.setInt(2, customerId); pp.executeUpdate();
+                        } else {
+                            int pointsEarned = (int) subtotal;
+                            PreparedStatement pp = cp.prepareStatement(
+                                "UPDATE customers SET loyalty_points = loyalty_points + ? WHERE customer_id = ?");
+                            pp.setInt(1, pointsEarned); pp.setInt(2, customerId); pp.executeUpdate();
+                        }
+                    } catch (Exception ignored) {}
+                }
+
+                // Get updated points to return
+                int updatedPoints = 0;
+                if (customerId > 0) {
+                    try (Connection cp = DatabaseManager.getConnection();
+                         PreparedStatement pp = cp.prepareStatement("SELECT loyalty_points FROM customers WHERE customer_id = ?")) {
+                        pp.setInt(1, customerId);
+                        ResultSet rp = pp.executeQuery();
+                        if (rp.next()) updatedPoints = rp.getInt(1);
+                    } catch (Exception ignored) {}
+                }
+
                 DatabaseManager.saveAuditEvent("SALE",
                     "Order#" + orderId + " | Total: " + String.format("%.2f", total) +
                     " | Payment: " + paymentMethod);
 
-                sendJson(ex, 200, "{\"ok\":true,\"orderId\":" + orderId + "}");
+                sendJson(ex, 200, "{\"ok\":true,\"orderId\":" + orderId + ",\"loyaltyPoints\":" + updatedPoints + "}");
 
             } catch (Exception e) {
                 sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}");
@@ -451,7 +480,8 @@ public class PosServer {
                     int id = rs.getInt(1);
                     StringBuilder sb = new StringBuilder();
                     sb.append("{").append("\"ok\":true,").append("\"customerId\":").append(id)
-                      .append(",\"name\":").append(q(name)).append(",\"email\":").append(q(email)).append("}");
+                      .append(",\"name\":").append(q(name)).append(",\"email\":").append(q(email))
+                      .append(",\"loyaltyPoints\":0}");
                     sendJson(ex, 200, sb.toString());
                 }
             } catch (SQLException e) { sendJson(ex, 500, escape(e.getMessage())); }
@@ -467,7 +497,7 @@ public class PosServer {
             String body  = readBody(ex);
             String email = jsonVal(body, "email");
             String pass  = jsonVal(body, "password");
-            String sql = "SELECT customer_id, name, email FROM customers WHERE email = ? AND password_hash = ?";
+            String sql = "SELECT customer_id, name, email, loyalty_points FROM customers WHERE email = ? AND password_hash = ?";
             try (Connection c = DatabaseManager.getConnection();
                  PreparedStatement ps = c.prepareStatement(sql)) {
                 ps.setString(1, email);
@@ -478,7 +508,8 @@ public class PosServer {
                     sb.append("{").append("\"ok\":true,")
                       .append("\"customerId\":").append(rs.getInt("customer_id")).append(",")
                       .append("\"name\":").append(q(rs.getString("name"))).append(",")
-                      .append("\"email\":").append(q(rs.getString("email"))).append("}");
+                      .append("\"email\":").append(q(rs.getString("email"))).append(",")
+                      .append("\"loyaltyPoints\":").append(rs.getInt("loyalty_points")).append("}");
                     sendJson(ex, 200, sb.toString());
                 } else {
                     sendJson(ex, 401, "{\"error\":\"Invalid email or password\"}");
@@ -525,6 +556,30 @@ public class PosServer {
             } catch (SQLException e) { sendJson(ex, 500, escape(e.getMessage())); return; }
             sb.append("]");
             sendJson(ex, 200, sb.toString());
+        }
+    }
+
+    // ── GET /api/customer/points?customerId=N ────────────────────────────────
+    static class CustomerPointsHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            String query = ex.getRequestURI().getQuery();
+            int customerId = -1;
+            if (query != null && query.contains("customerId=")) {
+                try { customerId = Integer.parseInt(query.split("customerId=")[1].split("&")[0]); } catch (Exception ignored) {}
+            }
+            if (customerId < 0) { sendJson(ex, 400, "{\"error\":\"Missing customerId\"}"); return; }
+            String sql = "SELECT loyalty_points FROM customers WHERE customer_id = ?";
+            try (Connection c = DatabaseManager.getConnection();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, customerId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    sendJson(ex, 200, "{\"points\":" + rs.getInt("loyalty_points") + "}");
+                } else {
+                    sendJson(ex, 404, "{\"error\":\"Customer not found\"}");
+                }
+            } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); }
         }
     }
 

@@ -380,8 +380,9 @@ tbody td{padding:10px 14px;color:var(--dark)}
     <div class="nav-label">Shop</div>
     <div class="nav-item active" onclick="switchView('register',this)"><i class="ti ti-shopping-cart"></i> Register</div>
     <div class="nav-item" id="nav-my-orders" onclick="switchView('my-orders',this)" style="display:none"><i class="ti ti-clock-history"></i> My Orders</div>
+    <div class="nav-item" id="nav-loyalty" onclick="switchView('loyalty',this)" style="display:none"><i class="ti ti-star"></i> My Points <span id="nav-points-badge" style="margin-left:auto;font-size:10px;background:rgba(46,124,246,.15);color:var(--accent2);border-radius:10px;padding:2px 7px;font-weight:600"></span></div>
 
-    <div class="nav-label">Staff</div>
+    <div class="nav-label" id="nav-label-staff">Staff</div>
     <div class="nav-item" id="nav-staff-toggle" onclick="toggleStaffMenu()">
       <i class="ti ti-layout-grid"></i> Staff Panel
       <i class="ti ti-chevron-down" id="staff-chevron" style="margin-left:auto;font-size:13px;transition:.25s"></i>
@@ -567,6 +568,19 @@ tbody td{padding:10px 14px;color:var(--dark)}
       </div>
     </div>
 
+    <!-- LOYALTY VIEW -->
+    <div class="view" id="view-loyalty">
+      <div class="view-body">
+        <div class="view-head" style="margin-bottom:24px">
+          <div>
+            <div class="view-h">My Points</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Earn points with every purchase</div>
+          </div>
+        </div>
+        <div id="loyalty-content"></div>
+      </div>
+    </div>
+
     <!-- EMPLOYEES VIEW -->
     <div class="view" id="view-employees">
       <div class="view-body">
@@ -628,7 +642,9 @@ tbody td{padding:10px 14px;color:var(--dark)}
       <button class="pay-btn" id="pay-card" onclick="setPayment('Card')"><i class="ti ti-credit-card"></i> Card</button>
       <button class="pay-btn" id="pay-gcash" onclick="setPayment('GCash')"><i class="ti ti-device-mobile"></i> GCash</button>
       <button class="pay-btn" id="pay-other" onclick="setPayment('Other')"><i class="ti ti-wallet"></i> Other</button>
+      <button class="pay-btn" id="pay-points" onclick="setPayment('Points')" style="display:none"><i class="ti ti-star"></i> Points</button>
     </div>
+    <div id="points-info" style="display:none;font-size:12px;color:var(--accent2);padding:6px 0;text-align:center"></div>
     <div class="cash-fields" id="cash-fields">
       <input type="number" id="cash-tendered" placeholder="Amount Tendered (₱)" oninput="calcChange()" min="0" step="0.01">
       <div class="change-line" id="change-line"></div>
@@ -939,6 +955,79 @@ function closeEmpModal(){
   document.getElementById('emp-modal').classList.remove('open');
 }
 
+// ════════════ LOYALTY SYSTEM ════════════
+function updateLoyaltyBadge(pts){
+  const badge = document.getElementById('nav-points-badge');
+  if(badge) badge.textContent = (pts||0)+' pts';
+}
+
+function getLoyaltyTier(pts){
+  if(pts>=5000) return {name:'Gold',color:'#E8A830',icon:'ti-crown'};
+  if(pts>=1000) return {name:'Silver',color:'#888780',icon:'ti-medal'};
+  return {name:'Bronze',color:'#C87A3A',icon:'ti-award'};
+}
+
+async function renderLoyalty(){
+  const el=document.getElementById('loyalty-content');
+  if(!currentCustomer){ el.innerHTML='<div style="color:var(--muted)">Please sign in to view your points.</div>'; return; }
+  const pts = currentCustomer.loyaltyPoints||0;
+  const tier = getLoyaltyTier(pts);
+  const nextTier = pts<1000?{name:'Silver',need:1000}:pts<5000?{name:'Gold',need:5000}:null;
+  const progress = nextTier ? Math.min(100,Math.round((pts/(nextTier.need))*100)) : 100;
+
+  el.innerHTML=`
+    <div style="max-width:560px">
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="width:56px;height:56px;border-radius:50%;background:${tier.color}22;display:flex;align-items:center;justify-content:center">
+            <i class="ti ${tier.icon}" style="font-size:26px;color:${tier.color}"></i>
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Current Tier</div>
+            <div style="font-size:22px;font-weight:700;color:${tier.color}">${tier.name}</div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-size:13px;color:var(--muted)">Total Points</div>
+            <div style="font-size:28px;font-weight:700;color:var(--accent)">${pts.toLocaleString()}</div>
+          </div>
+        </div>
+        ${nextTier?`
+        <div style="margin-bottom:8px;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+          <span>${pts} pts</span><span>${nextTier.need} pts for ${nextTier.name}</span>
+        </div>
+        <div style="background:var(--border);border-radius:20px;height:8px;overflow:hidden">
+          <div style="width:${progress}%;height:100%;background:${tier.color};border-radius:20px;transition:.4s"></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">${nextTier.need-pts} more points to reach ${nextTier.name}</div>
+        `:`<div style="font-size:13px;color:#E8A830;margin-top:4px">⭐ You've reached the highest tier!</div>`}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">BRONZE</div>
+          <div style="font-weight:600;color:#C87A3A">0 – 999 pts</div>
+        </div>
+        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;${pts>=1000?'border-color:#888780':''}" >
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">SILVER</div>
+          <div style="font-weight:600;color:#888780">1,000 – 4,999 pts</div>
+        </div>
+        <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;${pts>=5000?'border-color:#E8A830':''}">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">GOLD</div>
+          <div style="font-weight:600;color:#E8A830">5,000+ pts</div>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px">
+        <div style="font-weight:600;margin-bottom:10px">How it works</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--muted)">
+          <div><i class="ti ti-plus" style="color:var(--accent2);margin-right:6px"></i>Earn <b>1 point</b> for every ₱1 spent (subtotal before discount)</div>
+          <div><i class="ti ti-star" style="color:var(--accent2);margin-right:6px"></i>Redeem points at checkout — <b>1 point = ₱1</b></div>
+          <div><i class="ti ti-info-circle" style="color:var(--accent2);margin-right:6px"></i>Points are not earned when paying with points</div>
+        </div>
+      </div>
+    </div>`;
+}
+
 function togglePw(inputId, btn){
   const inp = document.getElementById(inputId);
   const icon = btn.querySelector('i');
@@ -967,7 +1056,7 @@ function switchView(view, navEl){
   document.getElementById('topbar-title').textContent={
     register:'Register',inventory:'Inventory',sales:'Sales History',
     'restock-log':'Restock Log',timelog:'Time Logs',audit:'Audit Trail',
-    'my-orders':'My Orders','employees':'Employee Profiles'
+    'my-orders':'My Orders','employees':'Employee Profiles','loyalty':'My Points'
   }[view]||view;
   const isRegister = view==='register';
   document.getElementById('search-bar').style.display=isRegister?'':'none';
@@ -980,6 +1069,7 @@ function switchView(view, navEl){
   if(view==='timelog') renderTimeLog();
   if(view==='audit') renderAuditTrail();
   if(view==='employees') renderEmployees();
+  if(view==='loyalty') renderLoyalty();
   if(view==='my-orders') renderMyOrders();
 }
 
@@ -1131,7 +1221,7 @@ function toggleDisc(type){
 // ════════════ PAYMENT ════════════
 function setPayment(method){
   payMethod=method;
-  ['Cash','Card','GCash','Other'].forEach(m=>{
+  ['Cash','Card','GCash','Other','Points'].forEach(m=>{
     const btn=document.getElementById('pay-'+m.toLowerCase());
     if(btn) btn.classList.toggle('active',payMethod===m);
   });
@@ -1142,6 +1232,23 @@ function setPayment(method){
   document.getElementById('cash-tendered').value='';
   document.getElementById('change-line').textContent='';
   document.getElementById('account-info').value='';
+  // Points info
+  const pInfo=document.getElementById('points-info');
+  if(method==='Points' && currentCustomer){
+    const pts=currentCustomer.loyaltyPoints||0;
+    const totalEl=document.getElementById('tot-total');
+    const total=totalEl?parseFloat(totalEl.textContent.replace('₱',''))||0:0;
+    pInfo.style.display='block';
+    if(pts>=total){
+      pInfo.textContent=`✓ You have ${pts} pts — enough to cover ₱${total.toFixed(2)}`;
+      pInfo.style.color='#1D9E75';
+    } else {
+      pInfo.textContent=`⚠ You have ${pts} pts (need ${Math.ceil(total)} pts for ₱${total.toFixed(2)})`;
+      pInfo.style.color='#A32D2D';
+    }
+  } else if(pInfo){
+    pInfo.style.display='none';
+  }
 }
 
 function calcChange(){
@@ -1165,6 +1272,10 @@ async function checkout(){
   if(payMethod==='Cash'){
     const tendered=parseFloat(document.getElementById('cash-tendered').value)||0;
     if(tendered<total){showToast('✘ Insufficient cash amount');return;}
+  }
+  if(payMethod==='Points'){
+    const pts=currentCustomer?currentCustomer.loyaltyPoints||0:0;
+    if(pts<total){showToast('✘ Insufficient points (need '+Math.ceil(total)+' pts)');return;}
   }
   if((payMethod==='Card'||payMethod==='GCash')&&!document.getElementById('account-info').value.trim()){
     showToast('✘ Please enter account/card number');return;
@@ -1200,6 +1311,10 @@ async function checkout(){
     if(!res.ok) throw new Error(data.error||'Checkout failed');
     if(!data.orderId) throw new Error('No orderId returned');
     savedOrderId = data.orderId;
+    if(data.loyaltyPoints != null && currentCustomer) {
+      currentCustomer.loyaltyPoints = data.loyaltyPoints;
+      updateLoyaltyBadge(data.loyaltyPoints);
+    }
   } catch(e){
     showToast('⚠ DB save failed: ' + e.message);
     console.error('[API] Checkout error:', e.message);
@@ -1231,6 +1346,7 @@ async function checkout(){
   inv += '*'.repeat(38);
 
   // Build structured invoice object for the new receipt
+  const pointsEarned = payMethod!=='Points' && currentCustomer ? Math.floor(sub) : 0;
   const invObj = {
     orderId: savedOrderId,
     sub, disc, total,
@@ -1238,6 +1354,7 @@ async function checkout(){
     payment: payMethod,
     accountInfo,
     cashTendered: cashTenderedVal,
+    pointsEarned,
     items: ids.map(id => ({
       name: INVENTORY[id].name, icon: INVENTORY[id].icon,
       qty: cart[id], unitPrice: INVENTORY[id].price
@@ -1609,7 +1726,19 @@ function guestMode(){
 }
 
 function setCustomer(data){
-  currentCustomer = { customerId: data.customerId, name: data.name, email: data.email };
+  currentCustomer = { customerId: data.customerId, name: data.name, email: data.email, loyaltyPoints: data.loyaltyPoints||0 };
+  // Hide staff section from customers
+  document.getElementById('nav-label-staff').style.display='none';
+  document.getElementById('nav-staff-toggle').style.display='none';
+  document.getElementById('staff-submenu').style.display='none';
+  document.getElementById('nav-login-wrap').style.display='none';
+  document.getElementById('staff-footer').style.display='none';
+  // Show loyalty nav
+  document.getElementById('nav-loyalty').style.display='flex';
+  updateLoyaltyBadge(currentCustomer.loyaltyPoints);
+  // Show points payment option
+  const pointsBtn = document.getElementById('pay-points');
+  if(pointsBtn) pointsBtn.style.display='';
   document.getElementById('cust-avatar').textContent = data.name.charAt(0).toUpperCase();
   document.getElementById('cust-name-badge').textContent = data.name;
   document.getElementById('customer-badge-wrap').style.display = '';
@@ -1626,6 +1755,16 @@ function dismissAuthSplash(){
 
 function signOutCustomer(){
   currentCustomer = null;
+  // Restore staff section visibility
+  document.getElementById('nav-label-staff').style.display='';
+  document.getElementById('nav-staff-toggle').style.display='';
+  document.getElementById('nav-login-wrap').style.display='block';
+  // Hide loyalty nav
+  document.getElementById('nav-loyalty').style.display='none';
+  // Hide points payment
+  const pointsBtn = document.getElementById('pay-points');
+  if(pointsBtn) pointsBtn.style.display='none';
+  setPayment('Cash');
   document.getElementById('customer-badge-wrap').style.display = 'none';
   document.getElementById('nav-my-orders').style.display = 'none';
   switchView('register', document.querySelector('.nav-item'));
@@ -1718,7 +1857,7 @@ function buildReceiptHTML(inv){
   const dateStr = inv.orderDate
     ? new Date(inv.orderDate).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'})
     : new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});
-  const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet'};
+  const payIcons = {Cash:'ti-cash', Card:'ti-credit-card', GCash:'ti-device-mobile', Other:'ti-wallet', Points:'ti-star'};
   const payIcon = payIcons[inv.payment] || 'ti-wallet';
 
   // Varied barcode bars
@@ -1738,9 +1877,17 @@ function buildReceiptHTML(inv){
   const discRow = inv.disc > 0
     ? `<div class="r-tot-row disc"><span><i class="ti ti-discount-2" style="font-size:13px;vertical-align:-1px"></i> ${inv.discType} (20%)</span><span>-₱${(+inv.disc).toFixed(2)}</span></div>` : '';
 
+  const pointsRows = inv.payment==='Points'
+    ? `<div class="r-tot-row" style="color:#E8A830;font-weight:600"><span>Points Used</span><span>${Math.ceil(+inv.total)} pts</span></div>` : '';
+  const earnedRow = inv.payment!=='Points' && inv.pointsEarned
+    ? `<div class="r-tot-row" style="color:#1D9E75;font-size:12px"><span>🎯 Points Earned</span><span>+${inv.pointsEarned} pts</span></div>` : '';
   const cashRows = inv.payment==='Cash' && inv.cashTendered
     ? `<div class="r-tot-row" style="color:var(--mid)"><span>Cash Tendered</span><span>₱${(+inv.cashTendered).toFixed(2)}</span></div>
        <div class="r-tot-row" style="color:var(--success);font-weight:600"><span>Change</span><span>₱${(inv.change!=null?(+inv.change):((+inv.cashTendered)-(+inv.total))).toFixed(2)}</span></div>` : '';
+  const pointsRows = inv.payment==='Points'
+    ? `<div class="r-tot-row" style="color:#E8A830;font-weight:600"><span>Points Used</span><span>${Math.ceil(+inv.total)} pts</span></div>` : '';
+  const earnedRow = inv.payment!=='Points' && inv.pointsEarned
+    ? `<div class="r-tot-row" style="color:#1D9E75;font-size:12px"><span>🎯 Points Earned</span><span>+${inv.pointsEarned} pts</span></div>` : '';
 
   const acctInfo = inv.accountInfo
     ? `<div class="pay-details"><div class="pay-method">${inv.payment}</div><div class="pay-info">${inv.accountInfo}</div></div>`
@@ -1768,7 +1915,7 @@ function buildReceiptHTML(inv){
     <div class="receipt-totals">
       <div class="r-tot-row"><span>Subtotal</span><span>₱${(+inv.sub).toFixed(2)}</span></div>
       ${discRow}
-      ${cashRows}
+      ${cashRows}${pointsRows}${earnedRow}
       <div class="r-tot-row grand"><span>Total Paid</span><span>₱${(+inv.total).toFixed(2)}</span></div>
     </div>
     <div class="receipt-payment">
