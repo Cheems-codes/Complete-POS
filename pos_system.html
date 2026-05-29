@@ -1212,39 +1212,46 @@ async function confirmFulfillment(){
 async function renderDeliveryLogs(){
   const el = document.getElementById('delivery-list');
   el.innerHTML='<div style="color:var(--muted);font-size:13px">Loading…</div>';
+  let logs = [];
   try {
-    const res = await fetch(`${API}/delivery-logs`);
-    const logs = await res.json();
-    if(!logs.length){ el.innerHTML='<div style="color:var(--muted);padding:40px 0;text-align:center"><i class="ti ti-truck-off" style="font-size:32px;display:block;margin-bottom:8px;opacity:.3"></i>No delivery orders yet</div>'; return; }
-    el.innerHTML = logs.map(d=>{
-      let items = [];
-      try {
-        let raw = d.itemsJson;
-        if(raw && raw !== '[]' && raw !== 'null') {
-          if(typeof raw === 'string'){
-            // Handle double-escaped JSON from Java
-            raw = raw.replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-            items = JSON.parse(raw);
-          } else {
-            items = raw;
-          }
+    const res = await fetch(API+'/delivery-logs');
+    logs = await res.json();
+  } catch(e){
+    el.innerHTML='<div style="color:var(--danger)">⚠ Could not load delivery logs: '+e.message+'</div>';
+    return;
+  }
+  if(!Array.isArray(logs)||!logs.length){
+    el.innerHTML='<div style="color:var(--muted);padding:40px 0;text-align:center"><i class="ti ti-truck-off" style="font-size:32px;display:block;margin-bottom:8px;opacity:.3"></i>No delivery orders yet</div>';
+    return;
+  }
+  const html = logs.map(function(d){
+    let itemsHtml = 'See Sales History for items';
+    try {
+      let raw = d.itemsJson;
+      if(raw && raw!=='[]' && raw!=='null'){
+        if(typeof raw==='string') raw=JSON.parse(raw);
+        if(Array.isArray(raw)&&raw.length){
+          itemsHtml = raw.map(function(i){ return '<span style="background:var(--bg);border-radius:6px;padding:2px 8px;margin-right:4px;font-size:11px">'+(i.qty||1)+'x '+(i.name||'Item')+'</span>'; }).join('');
         }
-      } catch(e){ items = []; }
-      return `<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(46,124,246,.1);padding:3px 10px;border-radius:20px">#${String(d.orderId).padStart(4,'0')}</span>
-          <span style="font-weight:600">${d.customerName}</span>
-          <span style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;background:${d.status==='Pending'?'rgba(255,180,0,.12)':'rgba(29,158,117,.12)'};color:${d.status==='Pending'?'#E8A830':'#1D9E75'}">${d.status}</span>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px"><i class="ti ti-map-pin" style="margin-right:4px"></i>${d.deliveryAddress}</div>
-        <div style="font-size:12px;margin-bottom:10px">${items.length ? items.map(i=>`<span style="background:var(--bg);border-radius:6px;padding:2px 8px;margin-right:4px;font-size:11px">${(i.qty||1)}x ${i.name||'Item'}</span>`).join('') : '<span style="color:var(--muted);font-size:11px">See Sales History for items</span>'}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:10px">
-          <span style="font-size:13px;color:var(--muted)">${d.paymentMethod} · ${d.createdAt?.split('T')[0]||d.createdAt?.split(' ')[0]||''}</span>
-          <span style="font-weight:700;color:var(--accent)">₱${(+d.total).toFixed(2)}</span>
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e){ el.innerHTML='<div style="color:var(--danger)">⚠ Could not load delivery logs</div>'; }
+      }
+    } catch(e2){}
+    const statusBg = d.status==='Pending'?'rgba(255,180,0,.12)':'rgba(29,158,117,.12)';
+    const statusColor = d.status==='Pending'?'#E8A830':'#1D9E75';
+    const dateStr = (d.createdAt||'').split('T')[0]||(d.createdAt||'').split(' ')[0]||'';
+    return '<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      +'<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(46,124,246,.1);padding:3px 10px;border-radius:20px">#'+String(d.orderId).padStart(4,'0')+'</span>'
+      +'<span style="font-weight:600">'+(d.customerName||'Guest')+'</span>'
+      +'<span style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:20px;background:'+statusBg+';color:'+statusColor+'">'+(d.status||'Pending')+'</span>'
+      +'</div>'
+      +'<div style="font-size:12px;color:var(--muted);margin-bottom:8px"><i class="ti ti-map-pin" style="margin-right:4px"></i>'+(d.deliveryAddress||'—')+'</div>'
+      +'<div style="font-size:12px;margin-bottom:10px">'+itemsHtml+'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:10px">'
+      +'<span style="font-size:13px;color:var(--muted)">'+(d.paymentMethod||'—')+' · '+dateStr+'</span>'
+      +'<span style="font-weight:700;color:var(--accent)">₱'+(+d.total).toFixed(2)+'</span>'
+      +'</div></div>';
+  }).join('');
+  el.innerHTML = html;
 }
 
 // ════════════ PRODUCT MANAGEMENT ════════════
