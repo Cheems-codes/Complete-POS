@@ -2,6 +2,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +50,7 @@ public class PosServer {
         server.createContext("/api/customer/login",    new CustomerLoginHandler());
         server.createContext("/api/customer/orders",   new CustomerOrdersHandler());
         server.createContext("/api/staff",             new StaffHandler());
+        server.createContext("/api/staff/login",        new StaffLoginHandler());
         server.createContext("/api/customer/points",   new CustomerPointsHandler());
         server.createContext("/api/customer/address",  new CustomerAddressHandler());
         server.createContext("/api/store",             new StoreHandler());
@@ -504,7 +507,7 @@ public class PosServer {
                  PreparedStatement ps = c.prepareStatement(insertSql)) {
                 ps.setString(1, name);
                 ps.setString(2, email);
-                ps.setString(3, pass); // plain for now; hash in production
+                ps.setString(3, BCrypt.hashpw(pass, BCrypt.gensalt())); // bcrypt hash
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
                     int id = rs.getInt(1);
@@ -527,13 +530,12 @@ public class PosServer {
             String body  = readBody(ex);
             String email = jsonVal(body, "email");
             String pass  = jsonVal(body, "password");
-            String sql = "SELECT customer_id, name, email, loyalty_points, address FROM customers WHERE email = ? AND password_hash = ?";
+            String sql = "SELECT customer_id, name, email, loyalty_points, address, password_hash FROM customers WHERE email = ?";
             try (Connection c = DatabaseManager.getConnection();
                  PreparedStatement ps = c.prepareStatement(sql)) {
                 ps.setString(1, email);
-                ps.setString(2, pass);
                 ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
+                if (rs.next() && BCrypt.checkpw(pass, rs.getString("password_hash"))) {
                     StringBuilder sb = new StringBuilder();
                     sb.append("{").append("\"ok\":true,")
                       .append("\"customerId\":").append(rs.getInt("customer_id")).append(",")
@@ -638,6 +640,31 @@ public class PosServer {
         }
     }
 
+    // ── POST /api/staff/login ────────────────────────────────────────────────
+    // Body: { "identifier":"name or email", "password":"..." }
+    static class StaffLoginHandler implements HttpHandler {
+        @Override public void handle(HttpExchange ex) throws IOException {
+            if ("OPTIONS".equals(ex.getRequestMethod())) { sendJson(ex, 200, "{}"); return; }
+            if (!"POST".equals(ex.getRequestMethod())) { sendJson(ex, 405, "{}"); return; }
+            String body = readBody(ex);
+            String identifier = jsonVal(body, "identifier");
+            String pass = jsonVal(body, "password");
+            if (identifier == null || pass == null) { sendJson(ex, 400, "{\"error\":\"Missing fields\"}"); return; }
+            String sql = "SELECT id, name, email, password_hash FROM staff WHERE LOWER(name)=LOWER(?) OR LOWER(email)=LOWER(?)";
+            try (Connection c = DatabaseManager.getConnection();
+                 PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, identifier); ps.setString(2, identifier);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next() && BCrypt.checkpw(pass, rs.getString("password_hash"))) {
+                    sendJson(ex, 200, String.format("{\"ok\":true,\"id\":%d,\"name\":%s,\"email\":%s}",
+                        rs.getInt("id"), q(rs.getString("name")), q(rs.getString("email"))));
+                } else {
+                    sendJson(ex, 401, "{\"error\":\"Invalid credentials\"}");
+                }
+            } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); }
+        }
+    }
+
     // ── GET/POST/DELETE /api/staff ───────────────────────────────────────────
     static class StaffHandler implements HttpHandler {
         @Override public void handle(HttpExchange ex) throws IOException {
@@ -646,15 +673,15 @@ public class PosServer {
 
             if ("GET".equals(method)) {
                 StringBuilder sb = new StringBuilder("[");
-                String sql = "SELECT id, name, email, password_hash FROM staff ORDER BY name";
+                String sql = "SELECT id, name, email FROM staff ORDER BY name";
                 try (Connection c = DatabaseManager.getConnection();
                      Statement st = c.createStatement();
                      ResultSet rs = st.executeQuery(sql)) {
                     boolean first = true;
                     while (rs.next()) {
                         if (!first) sb.append(",");
-                        sb.append(String.format("{\"id\":%d,\"name\":%s,\"email\":%s,\"password\":%s}",
-                            rs.getInt("id"), q(rs.getString("name")), q(rs.getString("email")), q(rs.getString("password_hash"))));
+                        sb.append(String.format("{\"id\":%d,\"name\":%s,\"email\":%s}",
+                            rs.getInt("id"), q(rs.getString("name")), q(rs.getString("email"))));
                         first = false;
                     }
                 } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); return; }
@@ -671,12 +698,15 @@ public class PosServer {
                     if (idStr != null) {
                         String email = jsonVal(body, "email");
                         PreparedStatement ps = c.prepareStatement("UPDATE staff SET name=?, email=?, password_hash=? WHERE id=?");
-                        ps.setString(1, name); ps.setString(2, email); ps.setString(3, pass); ps.setInt(4, Integer.parseInt(idStr));
+                        ps.setString(1, name); ps.setString(2, email);
+                        ps.setString(3, BCrypt.hashpw(pass, BCrypt.gensalt()));
+                        ps.setInt(4, Integer.parseInt(idStr));
                         ps.executeUpdate();
                     } else {
                         String email = jsonVal(body, "email");
                         PreparedStatement ps = c.prepareStatement("INSERT INTO staff (name, email, password_hash) VALUES (?,?,?)");
-                        ps.setString(1, name); ps.setString(2, email); ps.setString(3, pass);
+                        ps.setString(1, name); ps.setString(2, email);
+                        ps.setString(3, BCrypt.hashpw(pass, BCrypt.gensalt()));
                         ps.executeUpdate();
                     }
                 } catch (SQLException e) { sendJson(ex, 500, "{\"error\":" + escape(e.getMessage()) + "}"); return; }

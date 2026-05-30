@@ -1029,7 +1029,7 @@ function editEmployee(id){
   document.getElementById('emp-modal-title').textContent='Edit Employee';
   document.getElementById('emp-name').value=emp.name;
   document.getElementById('emp-email').value=emp.email||'';
-  document.getElementById('emp-pass').value=emp.password;
+  document.getElementById('emp-pass').value='';
   document.getElementById('emp-err').style.display='none';
   document.getElementById('emp-modal').classList.add('open');
 }
@@ -1990,15 +1990,17 @@ async function doLogin(){
   if((identifier==='admin'||identifier==='manager'||identifier==='admin@pos.com') && pw===PASSWORDS.admin){
     user={name:'Admin',role:'Manager'};
   } else {
-    // Check employees from DB
+    // Check employees via server-side login (bcrypt)
     try {
-      const emps = await loadStaff();
-      const emp = emps.find(e=>
-        e.name.toLowerCase()===identifier ||
-        (e.email&&e.email.toLowerCase()===identifier) ||
-        e.name.toLowerCase().replace(/\s+/g,'')===identifier
-      );
-      if(emp && pw===emp.password) user={name:emp.name,role:'Employee'};
+      const res = await fetch(`${API}/staff/login`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({identifier, password: pw})
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok) user = {name: data.name, role: 'Employee'};
+      }
     } catch(e){}
   }
   if(user){
