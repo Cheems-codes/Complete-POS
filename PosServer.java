@@ -804,7 +804,13 @@ public class PosServer {
                     while (rs.next()) {
                         if (!first) sb.append(",");
                         String itemsJsonVal = rs.getString("items_json");
-                        if (itemsJsonVal == null) itemsJsonVal = "[]";
+                        // Sanitize itemsJson — must be a valid JSON array
+                        if (itemsJsonVal == null || itemsJsonVal.isBlank()) {
+                            itemsJsonVal = "[]";
+                        } else {
+                            itemsJsonVal = itemsJsonVal.trim();
+                            if (!itemsJsonVal.startsWith("[")) itemsJsonVal = "[]";
+                        }
                         sb.append("{")
                           .append("\"id\":").append(rs.getInt("id")).append(",")
                           .append("\"orderId\":").append(rs.getInt("order_id")).append(",")
