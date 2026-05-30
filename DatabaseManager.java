@@ -172,4 +172,18 @@ public class DatabaseManager {
             System.out.println("[DB] saveAuditEvent error: " + e.getMessage());
         }
     }
+
+    // ── GCASH PROOF ───────────────────────────────────────────────────────────
+    public static void saveGcashProof(int orderId, String gcashRef, String gcashProofB64) {
+        String sql = "UPDATE orders SET gcash_ref = ?, gcash_proof_b64 = ? WHERE order_id = ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, gcashRef);
+            ps.setString(2, gcashProofB64);
+            ps.setInt(3, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("[DB] saveGcashProof error: " + e.getMessage());
+        }
+    }
+
 }

@@ -130,6 +130,7 @@ public class PosServer {
             String sql = "SELECT o.order_id, o.order_date, o.subtotal, o.discount_type, o.discount_amount, " +
                          "o.total, o.payment_method, o.cash_tendered, o.change_amount, o.account_info, " +
                          "o.fulfillment, o.delivery_address, o.order_status, " +
+                         "o.gcash_ref, o.gcash_proof_b64, " +
                          "c.name AS customer_name " +
                          "FROM orders o LEFT JOIN customers c ON o.customer_id = c.customer_id " +
                          "ORDER BY o.order_date DESC";
@@ -144,7 +145,8 @@ public class PosServer {
                         "\"discountType\":%s,\"discountAmount\":%.2f,\"total\":%.2f," +
                         "\"paymentMethod\":%s,\"cashTendered\":%s,\"changeAmount\":%s," +
                         "\"accountInfo\":%s,\"customerName\":%s," +
-                        "\"fulfillment\":%s,\"deliveryAddress\":%s,\"orderStatus\":%s}",
+                        "\"fulfillment\":%s,\"deliveryAddress\":%s,\"orderStatus\":%s," +
+                        "\"gcashRef\":%s,\"gcashProofB64\":%s}",
                         rs.getInt("order_id"), q(rs.getString("order_date")),
                         rs.getDouble("subtotal"), q(rs.getString("discount_type")),
                         rs.getDouble("discount_amount"), rs.getDouble("total"),
@@ -155,7 +157,9 @@ public class PosServer {
                         q(rs.getString("customer_name")),
                         q(rs.getString("fulfillment")),
                         q(rs.getString("delivery_address")),
-                        q(rs.getString("order_status") != null ? rs.getString("order_status") : "Completed")));
+                        q(rs.getString("order_status") != null ? rs.getString("order_status") : "Completed"),
+                        q(rs.getString("gcash_ref")),
+                        q(rs.getString("gcash_proof_b64"))));
                     first = false;
                 }
             } catch (SQLException e) {
@@ -324,6 +328,8 @@ public class PosServer {
                 Double cashTendered   = hasKey(body,"cashTendered") ? dbl(body,"cashTendered") : null;
                 Double changeAmount   = hasKey(body,"changeAmount")  ? dbl(body,"changeAmount")  : null;
                 int customerId        = hasKey(body,"customerId") ? (int)dbl(body,"customerId") : -1;
+                String gcashRef       = jsonVal(body, "gcashRef");
+                String gcashProofB64  = jsonVal(body, "gcashProofB64");
 
                 // Build lightweight adapter objects for DatabaseManager
                 Discount discount = buildDiscount(discountType, discIdNumber);
@@ -333,6 +339,11 @@ public class PosServer {
                 String orderStatus = "delivery".equals(fulfillment) ? "Pending" : "Completed";
                 int orderId = DatabaseManager.saveOrderFull(subtotal, discount, payment,
                     discountAmount, total, customerId, fulfillment, deliveryAddr, orderStatus);
+
+                // Save GCash proof if present
+                if (orderId > 0 && (gcashRef != null || gcashProofB64 != null)) {
+                    DatabaseManager.saveGcashProof(orderId, gcashRef, gcashProofB64);
+                }
                 // Link order to customer if logged in
                 if (orderId > 0 && customerId > 0) {
                     try (Connection c2 = DatabaseManager.getConnection();
